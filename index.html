@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Bolsa de trabajo gastronómica de Grow Consultores. Vacantes en restaurantes, cafeterías y pastelerías del Perú.">
+<meta property="og:title" content="Growjobs Perú — Encuentra el empleo que necesitas">
+<meta property="og:description" content="Vacantes en restaurantes, cafeterías y pastelerías del Perú. Postula o déjanos tu perfil.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23173058'/%3E%3Cpath d='M5 14L9 10L12.5 13.5L18.5 7' stroke='%233ED9A0' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Growjobs Perú</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --cream:#F4EFE1; --paper:#FFFFFF; --sand:#EDE6D3;
+  --navy:#173058; --forest:#1C3B2C; --mint:#2FB988; --mint-deep:#15794F;
+  --ink:#17191C; --muted:#5E6257; --faint:#8C8E83; --line:#E0D8C2;
+  --warn:#8A5A12; --warn-bg:#FAEFD6;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --cream:#14171A; --paper:#1B1F23; --sand:#232830;
+  --navy:#9FBCE8; --forest:#7FD3AC; --mint:#4FD6A2; --mint-deep:#4FD6A2;
+  --ink:#ECEDE8; --muted:#A8ADA3; --faint:#7C8178; --line:#2D333B;
+  --warn:#E8BE72; --warn-bg:#32280F;
+}}
+:root[data-theme="dark"]{
+  --cream:#14171A; --paper:#1B1F23; --sand:#232830;
+  --navy:#9FBCE8; --forest:#7FD3AC; --mint:#4FD6A2; --mint-deep:#4FD6A2;
+  --ink:#ECEDE8; --muted:#A8ADA3; --faint:#7C8178; --line:#2D333B;
+  --warn:#E8BE72; --warn-bg:#32280F;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);
+  font-family:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;line-height:1.55}
+h1,h2,h3{margin:0;text-wrap:balance}
+.disp{font-family:'Anton','Archivo',system-ui,sans-serif;font-weight:400;letter-spacing:.4px;line-height:1.05}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--mint-deep)}
+:focus-visible{outline:2px solid var(--mint-deep);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.shell{max-width:1120px;margin:0 auto;padding-inline:20px}
+
+/* ---------- barra ---------- */
+.nav{background:var(--paper);border-bottom:1px solid var(--line);position:sticky;
+  top:env(safe-area-inset-top,0px);z-index:30}
+.nav .shell{display:flex;align-items:center;gap:14px;padding-block:13px}
+.mark{width:42px;height:42px;border-radius:50%;background:var(--navy);display:grid;place-items:center;flex:none}
+.word{font-weight:700;font-size:17px;letter-spacing:.2px;line-height:1.1}
+.word i{font-style:normal;color:var(--mint-deep)}
+.word small{display:block;font-weight:400;font-size:11px;color:var(--faint)}
+.nav .cta{margin-left:auto;background:var(--mint);color:#0B2418;border:none;border-radius:9px;
+  padding:10px 16px;font-weight:700;font-size:14px}
+@media (max-width:520px){.nav .cta{padding:9px 12px;font-size:13px}}
+
+/* ---------- portada ---------- */
+.hero{background:var(--navy);color:#fff}
+:root:not([data-theme="light"]) .hero{background:#101C33}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .hero{background:#173058}}
+.hero .shell{padding-block:54px 46px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#3ED9A0}
+.hero h1{font-size:clamp(34px,7.5vw,62px);color:#fff;max-width:14ch}
+.hero p{margin:0;font-size:17px;color:#C7D2E2;max-width:56ch}
+.seek{background:#fff;border-radius:13px;padding:7px;display:flex;gap:7px;max-width:640px;flex-wrap:wrap}
+.seek input{flex:1 1 200px;min-width:0;border:none;background:none;padding:12px 14px;color:#17191C}
+.seek input:focus{outline:none}
+.seek button{background:#173058;color:#fff;border:none;border-radius:9px;padding:12px 22px;font-weight:700}
+.trust{display:flex;gap:10px 26px;flex-wrap:wrap;font-size:13.5px;color:#9FB1C9}
+.trust b{color:#fff}
+
+/* ---------- filtros ---------- */
+.chips{background:var(--paper);border-bottom:1px solid var(--line)}
+.chips .shell{display:flex;gap:8px;flex-wrap:wrap;padding-block:16px}
+.chip{border:1.5px solid var(--line);background:var(--paper);color:var(--muted);
+  border-radius:99px;padding:8px 15px;font-size:13.5px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--mint);border-color:var(--mint);color:#0B2418}
+
+/* ---------- vacantes ---------- */
+main{padding-block:38px 60px}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.head h2{font-size:30px}
+.head span{font-size:13.5px;color:var(--faint)}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px;
+  display:flex;flex-direction:column;gap:11px;text-align:left;width:100%}
+.card:hover{border-color:var(--mint)}
+.cat{display:flex;align-items:center;gap:9px}
+.mono{width:34px;height:34px;border-radius:9px;background:var(--forest);color:#3ED9A0;
+  display:grid;place-items:center;font-size:11.5px;font-weight:700;flex:none}
+:root:not([data-theme="light"]) .mono{background:#16302A}
+.cat span{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.card h3{font-size:21px;font-weight:700;line-height:1.25}
+.where{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted)}
+.pay{align-self:flex-start;background:#E7F9F1;color:#166A47;font-weight:700;font-size:14px;
+  padding:6px 13px;border-radius:9px}
+:root:not([data-theme="light"]) .pay{background:#12342A;color:#5FD3A4}
+.tags{display:flex;gap:7px;flex-wrap:wrap}
+.tag{font-size:12px;color:var(--muted);background:var(--sand);padding:4px 10px;border-radius:99px}
+.tag.conf{background:var(--warn-bg);color:var(--warn);font-weight:700}
+.card footer{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:4px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint)}
+.card footer b{color:var(--navy);font-weight:700;font-size:13px}
+.none{background:var(--paper);border:1px dashed var(--line);border-radius:16px;padding:44px 22px;
+  text-align:center;color:var(--muted)}
+
+/* ---------- franja ---------- */
+.strip{background:var(--forest);color:#fff}
+:root:not([data-theme="light"]) .strip{background:#16302A}
+.strip .shell{padding-block:30px;display:flex;align-items:center;justify-content:space-between;
+  gap:18px;flex-wrap:wrap}
+.strip p{margin:0;font-size:17px;font-weight:600;max-width:52ch}
+.strip button{background:#3ED9A0;color:#0B2418;border:none;border-radius:10px;padding:13px 24px;font-weight:700}
+
+/* ---------- detalle / formulario ---------- */
+.view{display:none}
+.view.on{display:block}
+.back{background:none;border:none;color:var(--navy);font-weight:700;font-size:14px;padding:0;
+  display:inline-flex;align-items:center;gap:7px;margin-bottom:18px}
+.detail{display:grid;gap:26px;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);align-items:start}
+@media (max-width:860px){.detail{grid-template-columns:1fr}}
+.block{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
+.block h3{font-size:16px;font-weight:700;margin-bottom:11px}
+.block + .block{margin-top:16px}
+.list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+.list li{display:flex;gap:10px;font-size:14.5px;color:var(--muted)}
+.list li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mint);
+  flex:none;margin-top:8px}
+.bens{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.ben{display:flex;align-items:center;gap:10px;background:var(--sand);border-radius:11px;padding:12px;
+  font-size:13.5px;font-weight:600}
+.confbox{background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);
+  border-radius:12px;padding:15px;font-size:13.5px;color:var(--warn)}
+
+form{display:flex;flex-direction:column;gap:13px}
+.f{display:flex;flex-direction:column;gap:6px}
+.f label{font-size:12.5px;font-weight:700}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:9px;padding:11px 12px;
+  background:var(--cream);color:var(--ink);width:100%}
+:root:not([data-theme="light"]) .f input,
+:root:not([data-theme="light"]) .f select,
+:root:not([data-theme="light"]) .f textarea{background:var(--sand)}
+.f textarea{min-height:70px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media (max-width:480px){.two{grid-template-columns:1fr}}
+.drop{border:1.5px dashed var(--line);border-radius:11px;padding:18px;text-align:center;
+  font-size:13px;color:var(--muted);cursor:pointer;display:block}
+.consent{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.45}
+.consent input{margin-top:3px;flex:none}
+.send{background:var(--mint);color:#0B2418;border:none;border-radius:10px;padding:14px;font-weight:700;font-size:15px}
+.send:disabled{opacity:.5;cursor:not-allowed}
+.alt{border:1.5px solid var(--forest);color:var(--forest);background:none;border-radius:10px;
+  padding:12px;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:9px}
+.msg{border-radius:10px;padding:13px;font-size:13.5px;display:none}
+.msg.on{display:block}
+.msg.ok{background:#E7F9F1;color:#166A47}
+.msg.bad{background:#FBE7E5;color:#AF2222}
+:root:not([data-theme="light"]) .msg.ok{background:#12342A;color:#5FD3A4}
+:root:not([data-theme="light"]) .msg.bad{background:#37191A;color:#F08C86}
+
+/* ---------- pie ---------- */
+footer.site{background:#12233F;color:#C9D2E0}
+:root:not([data-theme="light"]) footer.site{background:#0E1218}
+footer.site .shell{padding-block:40px 26px;display:flex;gap:30px;flex-wrap:wrap;justify-content:space-between}
+footer.site h4{margin:0 0 10px;font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:#fff}
+footer.site p,footer.site li{margin:0;font-size:13.5px}
+footer.site ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px}
+footer.site a{color:#C9D2E0;text-decoration:none}
+footer.site a:hover{text-decoration:underline}
+.legal{border-top:1px solid #1E3457;margin-top:8px}
+.legal .shell{padding-block:16px;font-size:12px;color:#8091AC;display:flex;gap:12px;
+  justify-content:space-between;flex-wrap:wrap}
+details.priv{margin-top:12px}
+details.priv summary{cursor:pointer;font-size:12.5px;color:#8091AC}
+details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
+</style>
+
+<nav class="nav">
+  <div class="shell">
+    <div class="mark" aria-hidden="true">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 13.5L9 8.5L13 12.5L20 5.5" stroke="#3ED9A0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5.5H20V10.5" stroke="#3ED9A0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="word"><i>GROW</i>JOBS<small>por Grow Consultores</small></div>
+    <button class="cta" id="navCta" type="button">Dejar mi CV</button>
+  </div>
+</nav>
+
+<!-- ============ LISTADO ============ -->
+<div class="view on" id="vList">
+  <header class="hero">
+    <div class="shell">
+      <p class="eyebrow">Bolsa de trabajo gastronómica</p>
+      <h1 class="disp">Encuentra el empleo que necesitas</h1>
+      <p>Trabajamos con restaurantes, cafeterías y pastelerías del Perú. Postula a una vacante o déjanos tu perfil y te escribimos cuando salga algo para ti.</p>
+      <div class="seek">
+        <input id="q" type="search" placeholder="Busca por puesto o distrito" aria-label="Buscar vacante">
+        <button id="qBtn" type="button">Buscar</button>
+      </div>
+      <div class="trust">
+        <span><b>7 años</b> conectando talento con el sector</span>
+        <span>Perú · Colombia · Estados Unidos</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="chips"><div class="shell" id="chips" role="group" aria-label="Filtrar por área"></div></div>
+
+  <main class="shell">
+    <div class="head">
+      <h2 class="disp">Vacantes activas</h2>
+      <span id="count"></span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <section class="strip">
+    <div class="shell">
+      <p>¿No encuentras tu puesto? Déjanos tu perfil y te avisamos apenas salga una vacante para ti.</p>
+      <button id="stripCta" type="button">Dejar mi CV</button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ DETALLE ============ -->
+<div class="view" id="vDetail"><main class="shell"><div id="detail"></div></main></div>
+
+<footer class="site">
+  <div class="shell">
+    <div style="max-width:300px">
+      <div class="word" style="color:#fff"><i style="color:#3ED9A0">GROW</i>JOBS<small style="color:#8091AC">por Grow Consultores S.A.C.</small></div>
+      <p style="margin-top:11px">Consultora de recursos humanos especializada en el sector gastronómico.</p>
+    </div>
+    <div>
+      <h4>Candidatos</h4>
+      <ul>
+        <li><a href="#" data-go="list">Ver vacantes</a></li>
+        <li><a href="#" data-go="banco">Dejar mi CV</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <ul>
+        <li>empleos@growconsultores.pe</li>
+        <li>Av. José Pardo 399, Miraflores</li>
+      </ul>
+    </div>
+  </div>
+  <div class="shell"><details class="priv">
+    <summary>Aviso de privacidad y tratamiento de datos</summary>
+    <p>Grow Consultores S.A.C. trata los datos que compartes con la única finalidad de evaluarte en procesos de selección, actuales y futuros, afines a tu perfil. Los datos se conservan en nuestro banco de datos de candidatos y se comparten con la empresa contratante solo en la información pertinente al puesto. Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición escribiendo a empleos@growconsultores.pe. Tratamiento conforme a la Ley N.º 29733 de Protección de Datos Personales y su reglamento.</p>
+  </details></div>
+  <div class="legal"><div class="shell">
+    <span>© 2026 Grow Consultores S.A.C.</span>
+    <span>No solicitamos pagos a los candidatos en ninguna etapa del proceso.</span>
+  </div></div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =======================================================================
+     CONFIGURACIÓN — pegar aquí la URL del despliegue de Apps Script
+     (ver backend-apps-script.gs, paso 4 de la guía de despliegue).
+     ===================================================================== */
+  var ENDPOINT = "https://script.google.com/macros/s/AKfycbytyBD9trkyrR8iqVDvwU2OYJ3cN9wuwM9qi81KmeDwTKeKRQ73blkTfuSEmv1Vcc8/exec";
+  var WHATSAPP = "51918067255";
+
+  var MONO = {
+    "Cocina": "CO", "Servicio y Atención": "SA", "Barra": "BA",
+    "Panadería y Pastelería": "PP", "Administración": "AD",
+    "Limpieza y Mantenimiento": "LM", "Supervisión y Gerencia": "SG",
+    "Logística y Almacén": "LA", "Marketing y Ventas": "MV"
+  };
+
+  var VAC = [], FAM = "", Q = "";
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  var norm = function (s) {
+    return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  };
+  var money = function (v) { return "S/ " + Number(v).toLocaleString("es-PE"); };
+  var sueldo = function (v) {
+    if (!v.salario_min && !v.salario_max) return "Sueldo a convenir";
+    if (v.salario_min && v.salario_max && v.salario_min !== v.salario_max) {
+      return money(v.salario_min) + " – " + money(v.salario_max);
+    }
+    return money(v.salario_min || v.salario_max);
+  };
+  var quien = function (v) { return v.confidencial ? "Proceso confidencial" : (v.cliente || "Empresa del rubro"); };
+
+  fetch("./vacantes.json")
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      VAC = (d.vacantes || []).filter(function (v) { return v.activa !== false; });
+      chips(); listar();
+    })
+    .catch(function () {
+      $("grid").innerHTML = '<div class="none">No pudimos cargar las vacantes. Vuelve a intentarlo en un momento.</div>';
+    });
+
+  function chips() {
+    var fams = [];
+    VAC.forEach(function (v) { if (v.familia && fams.indexOf(v.familia) < 0) fams.push(v.familia); });
+    $("chips").innerHTML = ['<button class="chip" aria-pressed="true" data-f="">Todas</button>']
+      .concat(fams.map(function (f) {
+        return '<button class="chip" aria-pressed="false" data-f="' + esc(f) + '">' + esc(f) + "</button>";
+      })).join("");
+    Array.prototype.forEach.call($("chips").children, function (b) {
+      b.addEventListener("click", function () {
+        FAM = b.dataset.f;
+        Array.prototype.forEach.call($("chips").children, function (x) {
+          x.setAttribute("aria-pressed", String(x === b));
+        });
+        listar();
+      });
+    });
+  }
+
+  function listar() {
+    var res = VAC.filter(function (v) {
+      if (FAM && v.familia !== FAM) return false;
+      if (Q) {
+        var hay = norm([v.titulo, v.distrito, v.sede, v.familia, quien(v)].join(" "));
+        if (hay.indexOf(norm(Q)) < 0) return false;
+      }
+      return true;
+    });
+    $("count").textContent = res.length === 1 ? "1 vacante" : res.length + " vacantes";
+    if (!res.length) {
+      $("grid").innerHTML = '<div class="none"><strong>No hay vacantes con ese criterio ahora mismo.</strong>' +
+        '<br>Déjanos tu perfil y te escribimos cuando salga una que encaje contigo.</div>';
+      return;
+    }
+    $("grid").innerHTML = res.map(function (v) {
+      return '<button class="card" data-id="' + esc(v.id) + '">' +
+        '<span class="cat"><span class="mono">' + esc(MONO[v.familia] || "GJ") + "</span>" +
+          "<span>" + esc(v.familia || "") + "</span></span>" +
+        "<h3>" + esc(v.titulo) + "</h3>" +
+        '<span class="where">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.2A7 7 0 0112 3a7 7 0 017 6.8C19 14.8 12 21 12 21z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.8" r="2.2" stroke="currentColor" stroke-width="2"/></svg>' +
+          esc(v.distrito || "Lima") + " · " + esc(quien(v)) + "</span>" +
+        '<span class="pay">' + esc(sueldo(v)) + "</span>" +
+        '<span class="tags">' +
+          (v.confidencial ? '<span class="tag conf">Confidencial</span>' : "") +
+          (v.contrato ? '<span class="tag">' + esc(v.contrato) + "</span>" : "") +
+          (v.propinas && v.propinas !== "No aplica" ? '<span class="tag">Propina ' + esc(v.propinas.toLowerCase()) + "</span>" : "") +
+        "</span>" +
+        "<footer><span>" + esc(v.publicada || "") + "</span><b>Ver y postular →</b></footer>" +
+        "</button>";
+    }).join("");
+    Array.prototype.forEach.call($("grid").children, function (b) {
+      b.addEventListener("click", function () { abrir(b.dataset.id); });
+    });
+  }
+
+  $("qBtn").addEventListener("click", function () { Q = $("q").value; listar(); });
+  $("q").addEventListener("keydown", function (e) { if (e.key === "Enter") { Q = $("q").value; listar(); } });
+  $("q").addEventListener("input", function () { if (!$("q").value) { Q = ""; listar(); } });
+  $("navCta").addEventListener("click", function () { abrir(null); });
+  $("stripCta").addEventListener("click", function () { abrir(null); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-go]"), function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (a.dataset.go === "list") volver(); else abrir(null);
+    });
+  });
+
+  function volver() {
+    $("vDetail").classList.remove("on");
+    $("vList").classList.add("on");
+    window.scrollTo(0, 0);
+  }
+
+  function abrir(id) {
+    var v = id ? VAC.filter(function (x) { return x.id === id; })[0] : null;
+    var banco = !v;
+    $("detail").innerHTML =
+      '<button class="back" id="bk">← Volver a las vacantes</button>' +
+      '<div class="detail"><div>' +
+        '<div class="block">' +
+          (banco
+            ? '<p class="eyebrow" style="color:var(--mint-deep)">Banco de talento</p>' +
+              '<h2 class="disp" style="font-size:34px;margin:8px 0 12px">Déjanos tu perfil</h2>' +
+              "<p style=\"margin:0;color:var(--muted)\">Guardamos tu información en nuestro banco de candidatos y te escribimos por WhatsApp cuando salga una vacante que encaje con tu experiencia. No necesitas postular a una vacante puntual.</p>"
+            : '<p class="eyebrow" style="color:var(--mint-deep)">' + esc(v.familia || "") + "</p>" +
+              '<h2 class="disp" style="font-size:clamp(28px,6vw,42px);margin:8px 0 12px">' + esc(v.titulo) + "</h2>" +
+              '<span class="where" style="margin-bottom:12px">' + esc(v.distrito || "Lima") +
+                (v.sede ? " · " + esc(v.sede) : "") + " · " + esc(quien(v)) + "</span>" +
+              '<div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">' +
+                '<span class="pay">' + esc(sueldo(v)) + "</span>" +
+                (v.contrato ? '<span class="tag">' + esc(v.contrato) + "</span>" : "") +
+                (v.jornada ? '<span class="tag">' + esc(v.jornada) + "</span>" : "") +
+                (v.propinas && v.propinas !== "No aplica" ? '<span class="tag">Propina ' + esc(v.propinas.toLowerCase()) + "</span>" : "") +
+              "</div>" +
+              (v.confidencial
+                ? '<div class="confbox" style="margin-top:15px">Este proceso es confidencial: el nombre de la empresa se comparte contigo en una etapa avanzada, con tu autorización previa.</div>'
+                : "")) +
+        "</div>" +
+        (banco ? "" :
+          (v.proposito ? '<div class="block"><h3>Sobre la posición</h3><p style="margin:0;color:var(--muted)">' + esc(v.proposito) + "</p></div>" : "") +
+          ((!v.funciones || !v.funciones.length) && (!v.requisitos || !v.requisitos.length)
+            ? '<div class="block"><h3>Sobre el puesto</h3><p style="margin:0;color:var(--muted)">' +
+              "Te contamos el detalle de las funciones, el horario y los beneficios cuando nos comuniquemos contigo. " +
+              "Postula y una de nuestras reclutadoras te escribe por WhatsApp.</p></div>"
+            : "") +
+          bloqueLista("Funciones principales", v.funciones) +
+          bloqueLista("Requisitos", v.requisitos) +
+          bloqueLista("Condiciones del puesto", v.condiciones) +
+          bloqueLista("Documentación que te pediremos", v.documentacion) +
+          (v.beneficios && v.beneficios.length
+            ? '<div class="block"><h3>Beneficios</h3><div class="bens">' +
+              v.beneficios.map(function (b) {
+                return '<div class="ben"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor" opacity=".14"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+                  esc(b) + "</div>";
+              }).join("") + "</div></div>"
+            : "")
+        ) +
+      "</div>" + formulario(v, banco) + "</div>";
+
+    $("bk").addEventListener("click", volver);
+    wireForm(v, banco);
+    $("vList").classList.remove("on");
+    $("vDetail").classList.add("on");
+    window.scrollTo(0, 0);
+  }
+
+  function bloqueLista(titulo, items) {
+    if (!items || !items.length) return "";
+    return '<div class="block"><h3>' + esc(titulo) + '</h3><ul class="list">' +
+      items.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + "</ul></div>";
+  }
+
+  function formulario(v, banco) {
+    var puestos = [];
+    VAC.forEach(function (x) { if (puestos.indexOf(x.familia) < 0 && x.familia) puestos.push(x.familia); });
+    ["Cocina", "Servicio y Atención", "Barra", "Panadería y Pastelería",
+     "Administración", "Limpieza y Mantenimiento", "Logística y Almacén"].forEach(function (f) {
+      if (puestos.indexOf(f) < 0) puestos.push(f);
+    });
+    return '<div><div class="block" style="position:sticky;top:90px">' +
+      "<h3 style=\"font-size:19px\">" + (banco ? "Regístrate en el banco de talento" : "Postula a esta vacante") + "</h3>" +
+      '<p style="margin:0 0 14px;font-size:13px;color:var(--muted)">Te escribimos por WhatsApp o correo. La postulación es gratuita.</p>' +
+      '<form id="fm" novalidate>' +
+        '<div class="two">' +
+          '<div class="f"><label for="nom">Nombres</label><input id="nom" name="nombres" autocomplete="given-name" required></div>' +
+          '<div class="f"><label for="ape">Apellidos</label><input id="ape" name="apellidos" autocomplete="family-name" required></div>' +
+        "</div>" +
+        '<div class="two">' +
+          '<div class="f"><label for="tel">WhatsApp</label><input id="tel" name="telefono" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" autocomplete="tel" required></div>' +
+          '<div class="f"><label for="dis">Distrito</label><input id="dis" name="distrito" placeholder="Ej. Surco" autocomplete="address-level2"></div>' +
+        "</div>" +
+        '<div class="f"><label for="cor">Correo electrónico</label><input id="cor" name="correo" type="email" autocomplete="email"></div>' +
+        (banco
+          ? '<div class="f"><label for="fam">Área en la que buscas trabajo</label><select id="fam" name="area">' +
+            puestos.map(function (f) { return '<option value="' + esc(f) + '">' + esc(f) + "</option>"; }).join("") +
+            "</select></div>"
+          : "") +
+        '<div class="two">' +
+          '<div class="f"><label for="exp">Años de experiencia</label><select id="exp" name="experiencia">' +
+            ["Sin experiencia", "Menos de 1 año", "1 a 2 años", "3 a 5 años", "Más de 5 años"].map(function (o) {
+              return '<option value="' + esc(o) + '">' + esc(o) + "</option>";
+            }).join("") + "</select></div>" +
+          '<div class="f"><label for="dsp">Disponibilidad</label><select id="dsp" name="disponibilidad">' +
+            ["Inmediata", "En 15 días", "En 30 días", "Solo fines de semana", "Solo turno mañana", "Solo turno tarde o noche"].map(function (o) {
+              return '<option value="' + esc(o) + '">' + esc(o) + "</option>";
+            }).join("") + "</select></div>" +
+        "</div>" +
+        '<div class="f"><label for="pre">Pretensión salarial mensual (opcional)</label><input id="pre" name="pretension" inputmode="numeric" placeholder="S/"></div>' +
+        '<label class="drop" for="cv"><input id="cv" name="cv" type="file" accept=".pdf,.doc,.docx,image/*" hidden>' +
+          '<span id="cvTxt">Adjunta tu CV · PDF, Word o foto · máx. 5 MB</span></label>' +
+        '<label class="consent"><input type="checkbox" id="ok" required>' +
+          "<span>Autorizo a Grow Consultores S.A.C. a tratar mis datos personales para evaluarme en este y en futuros procesos de selección, conforme a la Ley N.º 29733.</span></label>" +
+        '<button class="send" type="submit" id="go">' + (banco ? "Enviar mi perfil" : "Enviar postulación") + "</button>" +
+        '<div class="msg" id="msg"></div>' +
+      "</form>" +
+      '<div style="display:flex;align-items:center;gap:10px;margin:14px 0 12px">' +
+        '<span style="flex:1;height:1px;background:var(--line)"></span>' +
+        '<span style="font-size:12px;color:var(--faint)">o</span>' +
+        '<span style="flex:1;height:1px;background:var(--line)"></span></div>' +
+      '<a class="alt" id="wa" href="#" target="_blank" rel="noopener">' +
+        '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-4.46A8.5 8.5 0 1121 11.5z" stroke="currentColor" stroke-width="1.8"/></svg>' +
+        "Escríbenos por WhatsApp</a>" +
+      "</div></div>";
+  }
+
+  function wireForm(v, banco) {
+    var asunto = banco ? "el banco de talento" : ("la vacante de " + (v ? v.titulo : ""));
+    $("wa").href = "https://wa.me/" + WHATSAPP + "?text=" +
+      encodeURIComponent("Hola, quiero postular a " + asunto + ".");
+
+    var cv = $("cv");
+    cv.addEventListener("change", function () {
+      var f = cv.files && cv.files[0];
+      if (!f) { $("cvTxt").textContent = "Adjunta tu CV · PDF, Word o foto · máx. 5 MB"; return; }
+      if (f.size > 5 * 1024 * 1024) {
+        cv.value = "";
+        $("cvTxt").textContent = "Ese archivo pesa más de 5 MB. Elige uno más liviano.";
+        return;
+      }
+      $("cvTxt").textContent = f.name;
+    });
+
+    $("fm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = $("msg"), go = $("go");
+      msg.className = "msg";
+
+      var tel = $("tel").value.replace(/\D/g, "");
+      if (!$("nom").value.trim() || !$("ape").value.trim()) return falla("Escribe tus nombres y apellidos.");
+      if (tel.length !== 9 || tel[0] !== "9") return falla("Revisa tu número de WhatsApp: son 9 dígitos y empieza en 9.");
+      if ($("cor").value && $("cor").value.indexOf("@") < 0) return falla("Revisa tu correo electrónico.");
+      if (!$("ok").checked) return falla("Necesitamos tu autorización para tratar tus datos.");
+
+      function falla(t) { msg.textContent = t; msg.className = "msg bad on"; return false; }
+
+      var datos = {
+        tipo: banco ? "banco_de_talento" : "postulacion",
+        vacante_id: v ? v.id : "", vacante: v ? v.titulo : "",
+        cliente: v ? (v.confidencial ? "Confidencial" : v.cliente) : "",
+        nombres: $("nom").value.trim(), apellidos: $("ape").value.trim(),
+        telefono: tel, correo: $("cor").value.trim(), distrito: $("dis").value.trim(),
+        area: banco && $("fam") ? $("fam").value : (v ? v.familia : ""),
+        experiencia: $("exp").value, disponibilidad: $("dsp").value,
+        pretension: $("pre").value.trim(),
+        consentimiento: true, consentimiento_version: "v1 · Ley 29733",
+        enviado: new Date().toISOString(), origen: location.hostname || "local"
+      };
+
+      go.disabled = true; go.textContent = "Enviando…";
+      adjuntar(function (archivo) {
+        if (archivo) { datos.cv_nombre = archivo.nombre; datos.cv_tipo = archivo.tipo; datos.cv_base64 = archivo.b64; }
+        if (!ENDPOINT) {
+          go.disabled = false; go.textContent = banco ? "Enviar mi perfil" : "Enviar postulación";
+          msg.className = "msg bad on";
+          msg.textContent = "El formulario todavía no está conectado. Escríbenos por WhatsApp mientras tanto.";
+          return;
+        }
+        fetch(ENDPOINT, { method: "POST", body: JSON.stringify(datos),
+                          headers: { "Content-Type": "text/plain;charset=utf-8" } })
+          .then(function (r) { return r.json(); })
+          .then(function (r) {
+            if (!r || r.ok !== true) throw new Error("rechazado");
+            $("fm").reset();
+            $("cvTxt").textContent = "Adjunta tu CV · PDF, Word o foto · máx. 5 MB";
+            msg.className = "msg ok on";
+            msg.textContent = banco
+              ? "Listo. Tu perfil quedó registrado; te escribimos cuando salga una vacante para ti."
+              : "Listo. Recibimos tu postulación y te contactamos por WhatsApp o correo.";
+          })
+          .catch(function () {
+            msg.className = "msg bad on";
+            msg.textContent = "No pudimos enviar tu postulación. Intenta de nuevo o escríbenos por WhatsApp.";
+          })
+          .then(function () {
+            go.disabled = false; go.textContent = banco ? "Enviar mi perfil" : "Enviar postulación";
+          });
+      });
+    });
+  }
+
+  function adjuntar(cb) {
+    var f = $("cv").files && $("cv").files[0];
+    if (!f) return cb(null);
+    var rd = new FileReader();
+    rd.onload = function () {
+      cb({ nombre: f.name, tipo: f.type || "application/octet-stream",
+           b64: String(rd.result).split(",")[1] || "" });
+    };
+    rd.onerror = function () { cb(null); };
+    rd.readAsDataURL(f);
+  }
+})();
+</script>
+
+</body>
+</html>
