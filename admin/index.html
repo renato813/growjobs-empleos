@@ -326,21 +326,17 @@ td.wrap{white-space:normal;min-width:200px}
 
   var sesion = null, pase = null, popup = null;
 
-  function guardarSesion(d) {
-    sesion = d; pase = d.pase;
-    try { sessionStorage.setItem("gj_pase", JSON.stringify(d)); } catch (e) {}
+  function guardarPase(p) {
+    pase = p;
+    try { sessionStorage.setItem("gj_pase", p); } catch (e) {}
   }
-  function leerSesion() {
-    try {
-      var s = sessionStorage.getItem("gj_pase");
-      if (!s) return null;
-      var d = JSON.parse(s);
-      return d && d.pase ? d : null;
-    } catch (e) { return null; }
+  function leerPase() {
+    try { return sessionStorage.getItem("gj_pase") || null; } catch (e) { return null; }
   }
   function cerrarSesion() {
     sesion = null; pase = null;
     try { sessionStorage.removeItem("gj_pase"); } catch (e) {}
+    try { history.replaceState(null, "", location.pathname); } catch (e) {}
     $("app").className = "";
     $("login").style.display = "grid";
     aviso("avisoLogin", "", "");
@@ -359,41 +355,9 @@ td.wrap{white-space:normal;min-width:200px}
   }
 
   $("entrar").addEventListener("click", function () {
-    aviso("avisoLogin", "", "");
     $("entrar").disabled = true;
-    $("entrar").textContent = "Abriendo Google…";
-    var a = Math.round((screen.width - 520) / 2), b = Math.round((screen.height - 620) / 2);
-    popup = window.open(IDENTIDAD + "?identidad=1", "growjobs_ingreso",
-      "width=520,height=620,left=" + a + ",top=" + b);
-    if (!popup) {
-      $("entrar").disabled = false;
-      $("entrar").textContent = "Ingresar con Google";
-      aviso("avisoLogin", "Tu navegador bloqueó la ventana de ingreso. Permite las ventanas emergentes para este sitio y vuelve a intentarlo.", "bad");
-      return;
-    }
-    setTimeout(function () {
-      if (!sesion) {
-        $("entrar").disabled = false;
-        $("entrar").textContent = "Ingresar con Google";
-      }
-    }, 60000);
-  });
-
-  window.addEventListener("message", function (ev) {
-    if (ev.origin.indexOf("script.google") < 0 && ev.origin !== location.origin) return;
-    var m = ev.data;
-    if (!m || m.growjobs !== "identidad") return;
-    var d = m.datos || {};
-    $("entrar").disabled = false;
-    $("entrar").textContent = "Ingresar con Google";
-    if (!d.ok) {
-      aviso("avisoLogin", d.correo
-        ? "La cuenta " + d.correo + " todavía no tiene acceso al panel. Pídele a Renato que te dé de alta."
-        : "No pudimos leer tu cuenta de Google. Vuelve a intentarlo.", "bad");
-      return;
-    }
-    guardarSesion(d);
-    arrancar();
+    $("entrar").textContent = "Llevándote a Google…";
+    location.href = IDENTIDAD + "?identidad=1";
   });
 
   $("salir").addEventListener("click", cerrarSesion);
@@ -880,11 +844,19 @@ td.wrap{white-space:normal;min-width:200px}
 
   /* ───────────────── inicio ───────────────── */
 
-  var guardada = leerSesion();
-  if (guardada) {
-    sesion = guardada; pase = guardada.pase;
+  var delFragmento = /[#&]p=([^&]+)/.exec(location.hash || "");
+  if (delFragmento) {
+    guardarPase(decodeURIComponent(delFragmento[1]));
+    try { history.replaceState(null, "", location.pathname); } catch (e) {}
+  } else {
+    pase = leerPase();
+  }
+
+  if (pase) {
+    $("entrar").disabled = true;
+    $("entrar").textContent = "Verificando tu acceso…";
     llamar({ accion: "sesion" }).then(function (r) {
-      if (r && r.ok) { sesion = r.usuario; sesion.pase = pase; arrancar(); }
+      if (r && r.ok) { sesion = r.usuario; arrancar(); }
       else cerrarSesion();
     }).catch(cerrarSesion);
   }
