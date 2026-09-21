@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel · Growjobs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23173058'/%3E%3Cpath d='M5 14L9 10L12.5 13.5L18.5 7' stroke='%233ED9A0' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --cream:#F4EFE1; --paper:#FFFFFF; --sand:#EDE6D3;
+  --navy:#173058; --forest:#1C3B2C; --mint:#2FB988; --mint-deep:#15794F;
+  --ink:#17191C; --muted:#5E6257; --faint:#8C8E83; --line:#E0D8C2;
+  --warn:#8A5A12; --warn-bg:#FAEFD6; --bad:#9B2C2C; --bad-bg:#FBE9E9;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);
+  font-family:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14.5px;line-height:1.5}
+h1,h2,h3{margin:0;text-wrap:balance}
+.disp{font-family:'Anton',system-ui,sans-serif;font-weight:400;letter-spacing:.4px;line-height:1.05}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--mint-deep)}
+:focus-visible{outline:2px solid var(--mint-deep);outline-offset:2px;border-radius:4px}
+.shell{max-width:1440px;margin:0 auto;padding-inline:18px}
+
+/* ingreso */
+#login{min-height:100vh;display:grid;place-items:center;padding:24px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:34px;max-width:430px;width:100%}
+.mark{width:46px;height:46px;border-radius:50%;background:var(--navy);display:grid;place-items:center}
+.word{font-weight:700;font-size:18px;line-height:1.1;margin-top:14px}
+.word i{font-style:normal;color:var(--mint-deep)}
+.word small{display:block;font-weight:400;font-size:11.5px;color:var(--faint)}
+#login p{color:var(--muted);margin:14px 0 22px}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--navy);
+  color:#fff;border:none;border-radius:11px;padding:14px;font-weight:700;font-size:15px}
+.gbtn:disabled{opacity:.6}
+.aviso{margin-top:16px;padding:12px 14px;border-radius:10px;font-size:13.5px;display:none}
+.aviso.on{display:block}
+.aviso.bad{background:var(--bad-bg);color:var(--bad)}
+.aviso.ok{background:#E7F9F1;color:#166A47}
+
+/* marco */
+#app{display:none}
+#app.on{display:block}
+.top{background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.top .shell{display:flex;align-items:center;gap:14px;padding-block:12px}
+.top .mark{width:38px;height:38px}
+.top .word{margin:0;font-size:15px}
+.quien{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:13px}
+.chip{background:var(--sand);border-radius:99px;padding:5px 12px;font-weight:700;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.5px;color:var(--navy)}
+.salir{background:none;border:1px solid var(--line);border-radius:9px;padding:8px 13px;font-weight:600;font-size:13px}
+.tabs{background:var(--paper);border-bottom:1px solid var(--line)}
+.tabs .shell{display:flex;gap:6px;flex-wrap:wrap}
+.tab{background:none;border:none;border-bottom:3px solid transparent;padding:13px 14px;font-weight:700;
+  color:var(--muted);font-size:14px}
+.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--mint)}
+main{padding-block:26px 70px}
+.vista{display:none}
+.vista.on{display:block}
+.cabecera{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.cabecera h2{font-size:25px}
+.cabecera span{font-size:13px;color:var(--faint)}
+
+/* barras */
+.barra{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px;
+  display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.campo{display:flex;flex-direction:column;gap:5px;min-width:0}
+.campo label{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.campo select,.campo input{border:1.5px solid var(--line);background:var(--paper);border-radius:9px;
+  padding:9px 11px;min-width:140px;max-width:100%}
+.campo.ancho input{min-width:230px}
+.acciones{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.btn{border:1.5px solid var(--line);background:var(--paper);border-radius:9px;padding:9px 14px;font-weight:600;font-size:13.5px}
+.btn:hover{border-color:var(--mint)}
+.btn.pri{background:var(--mint);border-color:var(--mint);color:#0B2418;font-weight:700}
+.btn.sec{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.mini{padding:6px 10px;font-size:12.5px;border-radius:8px}
+
+/* tablas */
+.tabla{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:66vh}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+th{position:sticky;top:0;background:var(--sand);font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--navy);z-index:2}
+tbody tr:hover{background:#FBF9F3}
+td.wrap{white-space:normal;min-width:200px}
+.vacio{padding:44px 20px;text-align:center;color:var(--muted)}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:700}
+.pill.publicada{background:#E7F9F1;color:#166A47}
+.pill.borrador{background:var(--warn-bg);color:var(--warn)}
+.pill.cerrada{background:#EDEDED;color:#666}
+.pill.activo{background:#E7F9F1;color:#166A47}
+.pill.inactivo{background:#EDEDED;color:#666}
+.conf{background:var(--warn-bg);color:var(--warn);font-weight:700;padding:2px 8px;border-radius:99px;font-size:11px}
+
+/* modal */
+.fondo{position:fixed;inset:0;background:rgba(15,20,25,.55);display:none;z-index:60;padding:20px;overflow:auto}
+.fondo.on{display:block}
+.modal{background:var(--paper);border-radius:18px;max-width:880px;margin:24px auto;padding:26px}
+.modal h3{font-size:21px;margin-bottom:4px}
+.modal .sub{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+.rejilla{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.f{display:flex;flex-direction:column;gap:6px}
+.f.full{grid-column:1/-1}
+.f label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.f input,.f select,.f textarea{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;width:100%}
+.f textarea{min-height:92px;resize:vertical;font-family:inherit}
+.f .pista{font-size:11.5px;color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0}
+.marca{display:flex;align-items:center;gap:9px;font-size:13.5px}
+.pie{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
+.seccion{grid-column:1/-1;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--navy);border-top:1px solid var(--line);padding-top:16px;margin-top:4px}
+.cargando{padding:40px;text-align:center;color:var(--muted)}
+@media (max-width:640px){
+  .barra{padding:12px}
+  .campo select,.campo input{min-width:0;width:100%}
+  .campo{flex:1 1 100%}
+  .acciones{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<section id="login">
+  <div class="card">
+    <div class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 15L9 10L12.5 13.5L20 6" stroke="#3ED9A0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="word">GROW<i>JOBS</i><small>Panel de administración</small></div>
+    <p>Ingresa con la cuenta de Google que Grow Consultores te dio de alta. No usamos contraseñas: la identidad la valida Google.</p>
+    <button class="gbtn" id="entrar">Ingresar con Google</button>
+    <div class="aviso" id="avisoLogin"></div>
+  </div>
+</section>
+
+<div id="app">
+  <header class="top"><div class="shell">
+    <div class="mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 15L9 10L12.5 13.5L20 6" stroke="#3ED9A0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="word">GROW<i>JOBS</i><small>Panel</small></div>
+    <div class="quien">
+      <span id="quienNombre"></span>
+      <span class="chip" id="quienNivel"></span>
+      <button class="salir" id="salir">Salir</button>
+    </div>
+  </div></header>
+
+  <nav class="tabs"><div class="shell" id="navTabs"></div></nav>
+
+  <main class="shell">
+
+    <section class="vista" id="vVacantes">
+      <div class="cabecera"><h2 class="disp">Vacantes</h2><span id="contVac"></span></div>
+      <div class="barra">
+        <div class="campo ancho"><label for="vBuscar">Buscar</label><input id="vBuscar" placeholder="Puesto, cliente o sede"></div>
+        <div class="campo"><label for="vEstado">Estado</label><select id="vEstado"></select></div>
+        <div class="campo"><label for="vFamilia">Área</label><select id="vFamilia"></select></div>
+        <div class="campo"><label for="vCliente">Empresa</label><select id="vCliente"></select></div>
+        <div class="acciones">
+          <button class="btn" id="vRecargar">Actualizar</button>
+          <button class="btn pri" id="vNueva">Nueva vacante</button>
+        </div>
+      </div>
+      <div class="tabla"><div id="vTabla" class="cargando">Cargando…</div></div>
+    </section>
+
+    <section class="vista" id="vPostulantes">
+      <div class="cabecera"><h2 class="disp">Postulantes</h2><span id="contPos"></span></div>
+      <div class="barra">
+        <div class="campo ancho"><label for="pBuscar">Buscar</label><input id="pBuscar" placeholder="Nombre, teléfono o correo"></div>
+        <div class="campo"><label for="pVacante">Vacante</label><select id="pVacante"></select></div>
+        <div class="campo"><label for="pCliente">Empresa</label><select id="pCliente"></select></div>
+        <div class="campo"><label for="pArea">Área</label><select id="pArea"></select></div>
+        <div class="campo"><label for="pEstadoF">Estado</label><select id="pEstadoF"></select></div>
+        <div class="campo"><label for="pDistrito">Distrito</label><select id="pDistrito"></select></div>
+        <div class="campo"><label for="pExp">Experiencia</label><select id="pExp"></select></div>
+        <div class="campo"><label for="pDisp">Disponibilidad</label><select id="pDisp"></select></div>
+        <div class="campo"><label for="pDesde">Desde</label><input id="pDesde" type="date"></div>
+        <div class="campo"><label for="pHasta">Hasta</label><input id="pHasta" type="date"></div>
+        <div class="acciones">
+          <button class="btn" id="pLimpiar">Limpiar filtros</button>
+          <button class="btn" id="pRecargar">Actualizar</button>
+        </div>
+      </div>
+      <div class="barra">
+        <div class="campo"><label>Selección</label><span id="pSel" style="padding:9px 0;font-weight:700">0 de 0</span></div>
+        <div class="acciones">
+          <button class="btn" id="pTodos">Seleccionar lo filtrado</button>
+          <button class="btn" id="pNinguno">Quitar selección</button>
+          <button class="btn sec" id="pExcel">Descargar Excel</button>
+          <button class="btn sec" id="pPdf">Descargar PDF</button>
+          <button class="btn pri" id="pEstadoBtn">Cambiar estado</button>
+        </div>
+      </div>
+      <div class="tabla"><div id="pTabla" class="cargando">Cargando…</div></div>
+    </section>
+
+    <section class="vista" id="vUsuarios">
+      <div class="cabecera"><h2 class="disp">Usuarios</h2><span id="contUsu"></span></div>
+      <div class="barra">
+        <div class="campo ancho"><label for="uCorreo">Correo de Google</label><input id="uCorreo" type="email" placeholder="nombre@growconsultores.pe"></div>
+        <div class="campo ancho"><label for="uNombre">Nombre</label><input id="uNombre" placeholder="Nombre y apellido"></div>
+        <div class="campo"><label for="uNivel">Nivel</label><select id="uNivel"></select></div>
+        <div class="campo"><label for="uEstado">Estado</label><select id="uEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
+        <div class="acciones"><button class="btn pri" id="uGuardar">Guardar usuario</button></div>
+      </div>
+      <div class="aviso" id="uAviso"></div>
+      <div class="tabla"><div id="uTabla" class="cargando">Cargando…</div></div>
+      <p style="color:var(--muted);font-size:13px;margin-top:16px;max-width:78ch">
+        Los niveles definen qué puede hacer cada persona. <b>Administrador general</b>: todo, incluido dar de alta
+        usuarios. <b>Reclutadora</b>: crea y edita vacantes, las publica y gestiona a los postulantes.
+        <b>Publicador</b>: solo publica y despublica vacantes, sin ver datos de candidatos.
+        <b>Consulta</b>: ve vacantes y postulantes, sin modificar nada.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<div class="fondo" id="fondoVac"><div class="modal">
+  <h3 id="vacTitulo">Nueva vacante</h3>
+  <p class="sub">Los campos siguen las secciones de la ficha GC-RYS-FOR-001. Lo que dejes vacío no se muestra en el portal.</p>
+  <form id="formVac"><div class="rejilla">
+    <div class="f"><label for="fTitulo">Puesto</label><input id="fTitulo" required placeholder="Ej. Ayudante de Cocina"></div>
+    <div class="f"><label for="fFamilia">Área</label><select id="fFamilia"></select></div>
+    <div class="f"><label for="fCliente">Empresa / cliente</label><input id="fCliente" placeholder="Ej. El Verídico de Fidel"></div>
+    <div class="f"><label for="fSede">Sede</label><input id="fSede" placeholder="Ej. Magdalena del Mar"></div>
+    <div class="f"><label for="fDistrito">Distrito o ciudad</label><input id="fDistrito" placeholder="Ej. Lima"></div>
+    <div class="f"><label for="fEstado">Estado</label><select id="fEstado">
+      <option value="borrador">Borrador</option><option value="publicada">Publicada</option><option value="cerrada">Cerrada</option></select></div>
+    <div class="f full"><label class="marca"><input type="checkbox" id="fConf"> <span>Proceso confidencial — el portal no muestra el nombre del cliente</span></label></div>
+
+    <div class="seccion">Compensación</div>
+    <div class="f"><label for="fMin">Sueldo desde (S/)</label><input id="fMin" inputmode="numeric" placeholder="1500"></div>
+    <div class="f"><label for="fMax">Sueldo hasta (S/)</label><input id="fMax" inputmode="numeric" placeholder="1800"></div>
+    <div class="f"><label for="fContrato">Tipo de contrato</label><input id="fContrato" placeholder="Ej. Plazo fijo 3 meses"></div>
+    <div class="f"><label for="fJornada">Jornada y horario</label><input id="fJornada" placeholder="Ej. 48 h, turnos rotativos"></div>
+    <div class="f full"><label for="fPropinas">Régimen de propinas <span class="pista">si aplica</span></label><input id="fPropinas" placeholder="Ej. Pozo común repartido quincenalmente"></div>
+
+    <div class="seccion">Contenido del puesto</div>
+    <div class="f full"><label for="fProposito">Propósito del puesto</label><textarea id="fProposito" placeholder="Para qué existe el puesto, en dos o tres líneas."></textarea></div>
+    <div class="f full"><label for="fFunciones">Funciones <span class="pista">una por línea</span></label><textarea id="fFunciones"></textarea></div>
+    <div class="f full"><label for="fRequisitos">Requisitos <span class="pista">una por línea · criterios verificables, nunca edad, nacionalidad ni género</span></label><textarea id="fRequisitos"></textarea></div>
+    <div class="f full"><label for="fCondiciones">Condiciones reales del puesto <span class="pista">una por línea</span></label><textarea id="fCondiciones"></textarea></div>
+    <div class="f full"><label for="fBeneficios">Beneficios <span class="pista">una por línea</span></label><textarea id="fBeneficios"></textarea></div>
+    <div class="f full"><label for="fDocumentacion">Documentación habilitante <span class="pista">una por línea</span></label><textarea id="fDocumentacion"></textarea></div>
+  </div>
+  <div class="aviso" id="vacAviso"></div>
+  <div class="pie">
+    <button type="button" class="btn" id="vacCancelar">Cancelar</button>
+    <button type="submit" class="btn pri" id="vacGuardar">Guardar</button>
+  </div></form>
+</div></div>
+
+<div class="fondo" id="fondoEstado"><div class="modal" style="max-width:520px">
+  <h3>Cambiar estado</h3>
+  <p class="sub" id="estadoSub"></p>
+  <div class="rejilla">
+    <div class="f"><label for="eEstado">Nuevo estado</label><select id="eEstado"></select></div>
+    <div class="f"><label for="eReclutadora">Reclutadora <span class="pista">opcional</span></label><input id="eReclutadora" placeholder="Ej. Pamela"></div>
+    <div class="f full"><label for="eNotas">Notas <span class="pista">opcional</span></label><input id="eNotas"></div>
+  </div>
+  <div class="aviso" id="estadoAviso"></div>
+  <div class="pie">
+    <button type="button" class="btn" id="estadoCancelar">Cancelar</button>
+    <button type="button" class="btn pri" id="estadoAplicar">Aplicar</button>
+  </div>
+</div></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var API = "https://script.google.com/macros/s/AKfycbytyBD9trkyrR8iqVDvwU2OYJ3cN9wuwM9qi81KmeDwTKeKRQ73blkTfuSEmv1Vcc8/exec";
+  var IDENTIDAD = "https://script.google.com/macros/s/AKfycbyKmjq6OdCZohL-wKGKauaXSLty8RMi08u6T9QhwelXdI-zIPaCX1Xtj7jpSgkFNSRE/exec";
+
+  var FAMILIAS = ["Cocina", "Servicio y Atención", "Panadería y Pastelería", "Marketing y Ventas",
+                  "Supervisión y Gerencia", "Administración", "Producción y Almacén"];
+  var ESTADOS_POSTULANTE = ["Por contactar", "Contactado", "En evaluación", "Entrevista programada",
+                            "Terna presentada", "Contratado", "Descartado", "No contactable"];
+  var NIVELES = { admin: "Administrador general", reclutadora: "Reclutadora",
+                  publicador: "Publicador", consulta: "Consulta" };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  };
+  function aviso(id, texto, clase) {
+    var e = $(id);
+    e.textContent = texto || "";
+    e.className = "aviso" + (texto ? " on " + (clase || "bad") : "");
+  }
+  function opciones(sel, lista, primera) {
+    var v = sel.value;
+    sel.innerHTML = (primera ? '<option value="">' + esc(primera) + "</option>" : "") +
+      lista.map(function (o) {
+        var val = typeof o === "string" ? o : o.v, txt = typeof o === "string" ? o : o.t;
+        return '<option value="' + esc(val) + '">' + esc(txt) + "</option>";
+      }).join("");
+    if (v) sel.value = v;
+  }
+  function unicos(lista, campo) {
+    var m = {}, out = [];
+    lista.forEach(function (x) { var v = (x[campo] || "").trim(); if (v && !m[v]) { m[v] = 1; out.push(v); } });
+    return out.sort(function (a, b) { return a.localeCompare(b, "es"); });
+  }
+  function lineas(t) {
+    return String(t || "").split("\n").map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+  function soles(v) {
+    if (v === null || v === undefined || v === "") return "";
+    return "S/ " + Number(v).toLocaleString("es-PE");
+  }
+  function rango(v) {
+    if (v.salario_min && v.salario_max) return soles(v.salario_min) + " – " + soles(v.salario_max);
+    if (v.salario_min) return "Desde " + soles(v.salario_min);
+    if (v.salario_max) return "Hasta " + soles(v.salario_max);
+    return "A convenir";
+  }
+
+  /* ───────────────── sesión ───────────────── */
+
+  var sesion = null, pase = null, popup = null;
+
+  function guardarSesion(d) {
+    sesion = d; pase = d.pase;
+    try { sessionStorage.setItem("gj_pase", JSON.stringify(d)); } catch (e) {}
+  }
+  function leerSesion() {
+    try {
+      var s = sessionStorage.getItem("gj_pase");
+      if (!s) return null;
+      var d = JSON.parse(s);
+      return d && d.pase ? d : null;
+    } catch (e) { return null; }
+  }
+  function cerrarSesion() {
+    sesion = null; pase = null;
+    try { sessionStorage.removeItem("gj_pase"); } catch (e) {}
+    $("app").className = "";
+    $("login").style.display = "grid";
+    aviso("avisoLogin", "", "");
+  }
+  function puede(p) { return !!(sesion && sesion.permisos && sesion.permisos.indexOf(p) >= 0); }
+
+  function llamar(cuerpo) {
+    cuerpo.pase = pase;
+    return fetch(API, { method: "POST", body: JSON.stringify(cuerpo),
+                        headers: { "Content-Type": "text/plain;charset=utf-8" } })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (r && r.error === "sesion_invalida") { cerrarSesion(); throw new Error("sesion_invalida"); }
+        return r;
+      });
+  }
+
+  $("entrar").addEventListener("click", function () {
+    aviso("avisoLogin", "", "");
+    $("entrar").disabled = true;
+    $("entrar").textContent = "Abriendo Google…";
+    var a = Math.round((screen.width - 520) / 2), b = Math.round((screen.height - 620) / 2);
+    popup = window.open(IDENTIDAD + "?identidad=1", "growjobs_ingreso",
+      "width=520,height=620,left=" + a + ",top=" + b);
+    if (!popup) {
+      $("entrar").disabled = false;
+      $("entrar").textContent = "Ingresar con Google";
+      aviso("avisoLogin", "Tu navegador bloqueó la ventana de ingreso. Permite las ventanas emergentes para este sitio y vuelve a intentarlo.", "bad");
+      return;
+    }
+    setTimeout(function () {
+      if (!sesion) {
+        $("entrar").disabled = false;
+        $("entrar").textContent = "Ingresar con Google";
+      }
+    }, 60000);
+  });
+
+  window.addEventListener("message", function (ev) {
+    if (ev.origin.indexOf("script.google") < 0 && ev.origin !== location.origin) return;
+    var m = ev.data;
+    if (!m || m.growjobs !== "identidad") return;
+    var d = m.datos || {};
+    $("entrar").disabled = false;
+    $("entrar").textContent = "Ingresar con Google";
+    if (!d.ok) {
+      aviso("avisoLogin", d.correo
+        ? "La cuenta " + d.correo + " todavía no tiene acceso al panel. Pídele a Renato que te dé de alta."
+        : "No pudimos leer tu cuenta de Google. Vuelve a intentarlo.", "bad");
+      return;
+    }
+    guardarSesion(d);
+    arrancar();
+  });
+
+  $("salir").addEventListener("click", cerrarSesion);
+
+  /* ───────────────── arranque ───────────────── */
+
+  function arrancar() {
+    $("login").style.display = "none";
+    $("app").className = "on";
+    $("quienNombre").textContent = sesion.nombre || sesion.correo;
+    $("quienNivel").textContent = sesion.nivel_texto || NIVELES[sesion.nivel] || sesion.nivel;
+
+    var pestanas = [];
+    if (puede("vacantes.ver")) pestanas.push({ id: "vVacantes", t: "Vacantes" });
+    if (puede("postulantes.ver")) pestanas.push({ id: "vPostulantes", t: "Postulantes" });
+    if (puede("usuarios.gestionar")) pestanas.push({ id: "vUsuarios", t: "Usuarios" });
+
+    $("navTabs").innerHTML = pestanas.map(function (p, i) {
+      return '<button class="tab" role="tab" data-v="' + p.id + '" aria-selected="' + (i === 0) + '">' + esc(p.t) + "</button>";
+    }).join("");
+    [].forEach.call($("navTabs").children, function (b) {
+      b.addEventListener("click", function () { mostrar(b.getAttribute("data-v")); });
+    });
+    if (pestanas.length) mostrar(pestanas[0].id);
+
+    $("vNueva").style.display = puede("vacantes.editar") ? "" : "none";
+    $("pEstadoBtn").style.display = puede("postulantes.editar") ? "" : "none";
+
+    prepararVacantes();
+    prepararPostulantes();
+    prepararUsuarios();
+  }
+
+  function mostrar(id) {
+    [].forEach.call(document.querySelectorAll(".vista"), function (v) { v.className = "vista" + (v.id === id ? " on" : ""); });
+    [].forEach.call($("navTabs").children, function (b) { b.setAttribute("aria-selected", b.getAttribute("data-v") === id); });
+    if (id === "vVacantes" && !vacantes.length) cargarVacantes();
+    if (id === "vPostulantes" && !postulantes.length) cargarPostulantes();
+    if (id === "vUsuarios" && !usuarios.length) cargarUsuarios();
+  }
+
+  /* ───────────────── vacantes ───────────────── */
+
+  var vacantes = [], editando = null;
+
+  function prepararVacantes() {
+    opciones($("vEstado"), [{ v: "publicada", t: "Publicada" }, { v: "borrador", t: "Borrador" }, { v: "cerrada", t: "Cerrada" }], "Todos");
+    opciones($("fFamilia"), FAMILIAS, "");
+    ["vBuscar", "vEstado", "vFamilia", "vCliente"].forEach(function (id) {
+      $(id).addEventListener("input", pintarVacantes);
+      $(id).addEventListener("change", pintarVacantes);
+    });
+    $("vRecargar").addEventListener("click", cargarVacantes);
+    $("vNueva").addEventListener("click", function () { abrirVacante(null); });
+    $("vacCancelar").addEventListener("click", function () { $("fondoVac").className = "fondo"; });
+    $("formVac").addEventListener("submit", guardarVacante);
+  }
+
+  function cargarVacantes() {
+    $("vTabla").className = "cargando";
+    $("vTabla").textContent = "Cargando…";
+    llamar({ accion: "vacantes.listar" }).then(function (r) {
+      if (!r.ok) { $("vTabla").textContent = "No pudimos cargar las vacantes."; return; }
+      vacantes = r.vacantes || [];
+      opciones($("vFamilia"), unicos(vacantes, "familia"), "Todas");
+      opciones($("vCliente"), unicos(vacantes, "cliente"), "Todas");
+      pintarVacantes();
+    }).catch(function () { $("vTabla").textContent = "No pudimos cargar las vacantes."; });
+  }
+
+  function filtrarVacantes() {
+    var q = $("vBuscar").value.trim().toLowerCase();
+    var e = $("vEstado").value, f = $("vFamilia").value, c = $("vCliente").value;
+    return vacantes.filter(function (v) {
+      if (e && v.estado !== e) return false;
+      if (f && v.familia !== f) return false;
+      if (c && v.cliente !== c) return false;
+      if (q && (v.titulo + " " + v.cliente + " " + v.sede + " " + v.distrito).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+
+  function pintarVacantes() {
+    var lista = filtrarVacantes();
+    $("contVac").textContent = lista.length + " de " + vacantes.length;
+    if (!lista.length) {
+      $("vTabla").className = "vacio";
+      $("vTabla").textContent = vacantes.length ? "Ninguna vacante coincide con el filtro." : "Todavía no hay vacantes cargadas.";
+      return;
+    }
+    $("vTabla").className = "";
+    var editar = puede("vacantes.editar"), estado = puede("vacantes.estado");
+    $("vTabla").innerHTML =
+      "<table><thead><tr><th>Puesto</th><th>Empresa</th><th>Sede</th><th>Sueldo</th><th>Área</th>" +
+      "<th>Estado</th><th>Actualizado</th><th></th></tr></thead><tbody>" +
+      lista.map(function (v) {
+        var b = [];
+        if (editar) b.push('<button class="btn mini" data-ed="' + esc(v.id) + '">Editar</button>');
+        if (estado && v.estado !== "publicada") b.push('<button class="btn mini" data-pub="' + esc(v.id) + '">Publicar</button>');
+        if (estado && v.estado === "publicada") b.push('<button class="btn mini" data-desp="' + esc(v.id) + '">Despublicar</button>');
+        if (estado && v.estado !== "cerrada") b.push('<button class="btn mini" data-cerr="' + esc(v.id) + '">Cerrar</button>');
+        return "<tr><td class='wrap'><b>" + esc(v.titulo) + "</b>" +
+          (v.perfil_pendiente ? ' <span class="conf">perfil pendiente</span>' : "") + "</td>" +
+          "<td>" + esc(v.cliente || "—") + (v.confidencial ? ' <span class="conf">confidencial</span>' : "") + "</td>" +
+          "<td>" + esc(v.sede || v.distrito || "—") + "</td>" +
+          "<td>" + esc(rango(v)) + "</td>" +
+          "<td>" + esc(v.familia || "—") + "</td>" +
+          "<td><span class='pill " + esc(v.estado) + "'>" + esc(v.estado) + "</span></td>" +
+          "<td>" + esc(v.actualizado || "—") + "</td>" +
+          "<td style='white-space:nowrap'>" + b.join(" ") + "</td></tr>";
+      }).join("") + "</tbody></table>";
+
+    [].forEach.call($("vTabla").querySelectorAll("[data-ed]"), function (b) {
+      b.addEventListener("click", function () { abrirVacante(b.getAttribute("data-ed")); });
+    });
+    [["data-pub", "publicada"], ["data-desp", "borrador"], ["data-cerr", "cerrada"]].forEach(function (par) {
+      [].forEach.call($("vTabla").querySelectorAll("[" + par[0] + "]"), function (b) {
+        b.addEventListener("click", function () {
+          b.disabled = true;
+          llamar({ accion: "vacantes.estado", id: b.getAttribute(par[0]), estado: par[1] })
+            .then(cargarVacantes).catch(function () { b.disabled = false; });
+        });
+      });
+    });
+  }
+
+  function abrirVacante(id) {
+    editando = id ? vacantes.filter(function (v) { return v.id === id; })[0] : null;
+    var v = editando || {};
+    $("vacTitulo").textContent = editando ? "Editar vacante" : "Nueva vacante";
+    $("fTitulo").value = v.titulo || "";
+    $("fFamilia").value = v.familia || FAMILIAS[0];
+    $("fCliente").value = v.cliente || "";
+    $("fSede").value = v.sede || "";
+    $("fDistrito").value = v.distrito || "";
+    $("fEstado").value = v.estado || "borrador";
+    $("fConf").checked = !!v.confidencial;
+    $("fMin").value = v.salario_min || "";
+    $("fMax").value = v.salario_max || "";
+    $("fContrato").value = v.contrato || "";
+    $("fJornada").value = v.jornada || "";
+    $("fPropinas").value = v.propinas || "";
+    $("fProposito").value = v.proposito || "";
+    $("fFunciones").value = (v.funciones || []).join("\n");
+    $("fRequisitos").value = (v.requisitos || []).join("\n");
+    $("fCondiciones").value = (v.condiciones || []).join("\n");
+    $("fBeneficios").value = (v.beneficios || []).join("\n");
+    $("fDocumentacion").value = (v.documentacion || []).join("\n");
+    aviso("vacAviso", "", "");
+    $("fondoVac").className = "fondo on";
+    $("fTitulo").focus();
+  }
+
+  function guardarVacante(ev) {
+    ev.preventDefault();
+    var datos = {
+      id: editando ? editando.id : "",
+      titulo: $("fTitulo").value.trim(),
+      familia: $("fFamilia").value,
+      cliente: $("fCliente").value.trim(),
+      confidencial: $("fConf").checked,
+      sede: $("fSede").value.trim(),
+      distrito: $("fDistrito").value.trim(),
+      estado: $("fEstado").value,
+      salario_min: $("fMin").value.replace(/\D/g, ""),
+      salario_max: $("fMax").value.replace(/\D/g, ""),
+      contrato: $("fContrato").value.trim(),
+      jornada: $("fJornada").value.trim(),
+      propinas: $("fPropinas").value.trim(),
+      proposito: $("fProposito").value.trim(),
+      funciones: lineas($("fFunciones").value),
+      requisitos: lineas($("fRequisitos").value),
+      condiciones: lineas($("fCondiciones").value),
+      beneficios: lineas($("fBeneficios").value),
+      documentacion: lineas($("fDocumentacion").value)
+    };
+    datos.perfil_pendiente = !datos.funciones.length && !datos.requisitos.length;
+    if (!datos.titulo) { aviso("vacAviso", "Escribe el nombre del puesto.", "bad"); return; }
+    $("vacGuardar").disabled = true;
+    llamar({ accion: "vacantes.guardar", vacante: datos }).then(function (r) {
+      $("vacGuardar").disabled = false;
+      if (!r.ok) { aviso("vacAviso", "No se pudo guardar (" + (r.error || "error") + ").", "bad"); return; }
+      $("fondoVac").className = "fondo";
+      cargarVacantes();
+    }).catch(function () {
+      $("vacGuardar").disabled = false;
+      aviso("vacAviso", "No se pudo guardar. Revisa tu conexión.", "bad");
+    });
+  }
+
+  /* ───────────────── postulantes ───────────────── */
+
+  var postulantes = [], marcados = {};
+
+  function prepararPostulantes() {
+    opciones($("pEstadoF"), ESTADOS_POSTULANTE, "Todos");
+    opciones($("eEstado"), ESTADOS_POSTULANTE, "");
+    ["pBuscar", "pVacante", "pCliente", "pArea", "pEstadoF", "pDistrito", "pExp", "pDisp", "pDesde", "pHasta"]
+      .forEach(function (id) {
+        $(id).addEventListener("input", pintarPostulantes);
+        $(id).addEventListener("change", pintarPostulantes);
+      });
+    $("pRecargar").addEventListener("click", cargarPostulantes);
+    $("pLimpiar").addEventListener("click", function () {
+      ["pBuscar", "pVacante", "pCliente", "pArea", "pEstadoF", "pDistrito", "pExp", "pDisp", "pDesde", "pHasta"]
+        .forEach(function (id) { $(id).value = ""; });
+      pintarPostulantes();
+    });
+    $("pTodos").addEventListener("click", function () {
+      filtrarPostulantes().forEach(function (p) { marcados[p.fila] = true; });
+      pintarPostulantes();
+    });
+    $("pNinguno").addEventListener("click", function () { marcados = {}; pintarPostulantes(); });
+    $("pExcel").addEventListener("click", function () { exportar("excel"); });
+    $("pPdf").addEventListener("click", function () { exportar("pdf"); });
+    $("pEstadoBtn").addEventListener("click", abrirEstado);
+    $("estadoCancelar").addEventListener("click", function () { $("fondoEstado").className = "fondo"; });
+    $("estadoAplicar").addEventListener("click", aplicarEstado);
+  }
+
+  function cargarPostulantes() {
+    $("pTabla").className = "cargando";
+    $("pTabla").textContent = "Cargando…";
+    llamar({ accion: "postulantes.listar" }).then(function (r) {
+      if (!r.ok) { $("pTabla").textContent = "No pudimos cargar los postulantes."; return; }
+      postulantes = r.postulantes || [];
+      opciones($("pVacante"), unicos(postulantes, "vacante"), "Todas");
+      opciones($("pCliente"), unicos(postulantes, "cliente"), "Todas");
+      opciones($("pArea"), unicos(postulantes, "area"), "Todas");
+      opciones($("pDistrito"), unicos(postulantes, "distrito"), "Todos");
+      opciones($("pExp"), unicos(postulantes, "experiencia"), "Todas");
+      opciones($("pDisp"), unicos(postulantes, "disponibilidad"), "Todas");
+      pintarPostulantes();
+    }).catch(function () { $("pTabla").textContent = "No pudimos cargar los postulantes."; });
+  }
+
+  function filtrarPostulantes() {
+    var q = $("pBuscar").value.trim().toLowerCase();
+    var f = { vacante: $("pVacante").value, cliente: $("pCliente").value, area: $("pArea").value,
+              estado: $("pEstadoF").value, distrito: $("pDistrito").value,
+              experiencia: $("pExp").value, disponibilidad: $("pDisp").value };
+    var desde = $("pDesde").value, hasta = $("pHasta").value;
+    return postulantes.filter(function (p) {
+      for (var k in f) { if (f[k] && p[k] !== f[k]) return false; }
+      var dia = (p.fecha || "").slice(0, 10);
+      if (desde && dia && dia < desde) return false;
+      if (hasta && dia && dia > hasta) return false;
+      if (q) {
+        var t = (p.nombres + " " + p.apellidos + " " + p.telefono + " " + p.correo + " " + p.distrito).toLowerCase();
+        if (t.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+
+  function pintarPostulantes() {
+    var lista = filtrarPostulantes();
+    var n = lista.filter(function (p) { return marcados[p.fila]; }).length;
+    $("contPos").textContent = lista.length + " de " + postulantes.length;
+    $("pSel").textContent = n + " de " + lista.length;
+    var editar = puede("postulantes.editar");
+    $("pEstadoBtn").disabled = !editar || !n;
+    $("pExcel").disabled = !lista.length;
+    $("pPdf").disabled = !lista.length;
+
+    if (!lista.length) {
+      $("pTabla").className = "vacio";
+      $("pTabla").textContent = postulantes.length ? "Ningún postulante coincide con el filtro." : "Todavía no hay postulaciones.";
+      return;
+    }
+    $("pTabla").className = "";
+    $("pTabla").innerHTML =
+      "<table><thead><tr><th></th><th>Fecha</th><th>Nombre</th><th>WhatsApp</th><th>Correo</th><th>Distrito</th>" +
+      "<th>Vacante</th><th>Empresa</th><th>Área</th><th>Experiencia</th><th>Disponibilidad</th>" +
+      "<th>Pretensión</th><th>CV</th><th>Estado</th><th>Reclutadora</th></tr></thead><tbody>" +
+      lista.map(function (p) {
+        return "<tr><td><input type='checkbox' data-f='" + p.fila + "'" + (marcados[p.fila] ? " checked" : "") + "></td>" +
+          "<td>" + esc(p.fecha) + "</td>" +
+          "<td class='wrap'><b>" + esc(p.nombres + " " + p.apellidos) + "</b></td>" +
+          "<td><a href='https://wa.me/51" + esc(p.telefono) + "' target='_blank' rel='noopener'>" + esc(p.telefono) + "</a></td>" +
+          "<td>" + esc(p.correo || "—") + "</td>" +
+          "<td>" + esc(p.distrito || "—") + "</td>" +
+          "<td class='wrap'>" + esc(p.vacante || "—") + "</td>" +
+          "<td>" + esc(p.cliente || "—") + "</td>" +
+          "<td>" + esc(p.area || "—") + "</td>" +
+          "<td>" + esc(p.experiencia || "—") + "</td>" +
+          "<td>" + esc(p.disponibilidad || "—") + "</td>" +
+          "<td>" + esc(p.pretension || "—") + "</td>" +
+          "<td class='wrap'>" + esc(p.cv || "—") + "</td>" +
+          "<td>" + esc(p.estado || "—") + "</td>" +
+          "<td>" + esc(p.reclutadora || "—") + "</td></tr>";
+      }).join("") + "</tbody></table>";
+
+    [].forEach.call($("pTabla").querySelectorAll("input[data-f]"), function (c) {
+      c.addEventListener("change", function () {
+        var f = c.getAttribute("data-f");
+        if (c.checked) marcados[f] = true; else delete marcados[f];
+        var lista2 = filtrarPostulantes();
+        $("pSel").textContent = lista2.filter(function (p) { return marcados[p.fila]; }).length + " de " + lista2.length;
+        $("pEstadoBtn").disabled = !puede("postulantes.editar") ||
+          !lista2.filter(function (p) { return marcados[p.fila]; }).length;
+      });
+    });
+  }
+
+  function seleccionOFiltro() {
+    var lista = filtrarPostulantes();
+    var m = lista.filter(function (p) { return marcados[p.fila]; });
+    return m.length ? m : lista;
+  }
+
+  function abrirEstado() {
+    var n = filtrarPostulantes().filter(function (p) { return marcados[p.fila]; }).length;
+    $("estadoSub").textContent = "Se aplicará a " + n + (n === 1 ? " postulante seleccionado." : " postulantes seleccionados.");
+    aviso("estadoAviso", "", "");
+    $("fondoEstado").className = "fondo on";
+  }
+
+  function aplicarEstado() {
+    var filas = filtrarPostulantes().filter(function (p) { return marcados[p.fila]; })
+      .map(function (p) { return p.fila; });
+    if (!filas.length) return;
+    $("estadoAplicar").disabled = true;
+    llamar({ accion: "postulantes.estado", filas: filas, estado: $("eEstado").value,
+             reclutadora: $("eReclutadora").value.trim(), notas: $("eNotas").value.trim() })
+      .then(function (r) {
+        $("estadoAplicar").disabled = false;
+        if (!r.ok) { aviso("estadoAviso", "No se pudo actualizar.", "bad"); return; }
+        $("fondoEstado").className = "fondo";
+        marcados = {};
+        cargarPostulantes();
+      }).catch(function () {
+        $("estadoAplicar").disabled = false;
+        aviso("estadoAviso", "No se pudo actualizar.", "bad");
+      });
+  }
+
+  /* ───────────────── exportar ───────────────── */
+
+  var COLS = [
+    ["fecha", "Fecha"], ["nombres", "Nombres"], ["apellidos", "Apellidos"], ["telefono", "WhatsApp"],
+    ["correo", "Correo"], ["distrito", "Distrito"], ["vacante", "Vacante"], ["cliente", "Empresa"],
+    ["area", "Área"], ["experiencia", "Experiencia"], ["disponibilidad", "Disponibilidad"],
+    ["pretension", "Pretensión"], ["cv", "CV"], ["estado", "Estado"], ["reclutadora", "Reclutadora"]
+  ];
+
+  function cargarScript(url) {
+    return new Promise(function (ok, mal) {
+      var s = document.createElement("script");
+      s.src = url; s.onload = ok; s.onerror = mal;
+      document.head.appendChild(s);
+    });
+  }
+
+  function nombreArchivo(ext) {
+    var f = new Date().toISOString().slice(0, 10);
+    var v = $("pVacante").value || $("pCliente").value || "postulantes";
+    return "Growjobs_" + v.replace(/[^\w]+/g, "_").slice(0, 40) + "_" + f + "." + ext;
+  }
+
+  function resumenFiltros() {
+    var pares = [["Vacante", $("pVacante").value], ["Empresa", $("pCliente").value], ["Área", $("pArea").value],
+                 ["Estado", $("pEstadoF").value], ["Distrito", $("pDistrito").value],
+                 ["Experiencia", $("pExp").value], ["Disponibilidad", $("pDisp").value],
+                 ["Desde", $("pDesde").value], ["Hasta", $("pHasta").value],
+                 ["Búsqueda", $("pBuscar").value.trim()]];
+    var t = pares.filter(function (p) { return p[1]; }).map(function (p) { return p[0] + ": " + p[1]; }).join(" · ");
+    return t || "Sin filtros";
+  }
+
+  function exportar(tipo) {
+    var lista = seleccionOFiltro();
+    if (!lista.length) return;
+    var btn = tipo === "excel" ? $("pExcel") : $("pPdf");
+    var txt = btn.textContent;
+    btn.disabled = true; btn.textContent = "Preparando…";
+
+    var fin = function () { btn.disabled = false; btn.textContent = txt; };
+
+    if (tipo === "excel") {
+      cargarScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js").then(function () {
+        var filas = [COLS.map(function (c) { return c[1]; })];
+        lista.forEach(function (p) { filas.push(COLS.map(function (c) { return p[c[0]] || ""; })); });
+        var hoja = XLSX.utils.aoa_to_sheet(filas);
+        hoja["!cols"] = COLS.map(function (c) { return { wch: Math.max(12, c[1].length + 6) }; });
+        var libro = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(libro, hoja, "Postulantes");
+        XLSX.writeFile(libro, nombreArchivo("xlsx"));
+        fin();
+      }).catch(function () { fin(); alert("No pudimos preparar el Excel. Revisa tu conexión."); });
+      return;
+    }
+
+    cargarScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")
+      .then(function () { return cargarScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"); })
+      .then(function () {
+        var doc = new window.jspdf.jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+        doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(23, 48, 88);
+        doc.text("Growjobs · listado de postulantes", 32, 38);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(110, 115, 120);
+        doc.text("Grow Consultores S.A.C. · " + new Date().toLocaleString("es-PE"), 32, 52);
+        doc.text(resumenFiltros(), 32, 64, { maxWidth: 760 });
+        doc.autoTable({
+          startY: 78,
+          head: [COLS.map(function (c) { return c[1]; })],
+          body: lista.map(function (p) { return COLS.map(function (c) { return String(p[c[0]] || ""); }); }),
+          styles: { fontSize: 6.5, cellPadding: 3, overflow: "linebreak" },
+          headStyles: { fillColor: [23, 48, 88], textColor: 255, fontSize: 6.5 },
+          alternateRowStyles: { fillColor: [247, 246, 242] },
+          margin: { left: 24, right: 24 },
+          didDrawPage: function (d) {
+            doc.setFontSize(7); doc.setTextColor(140);
+            doc.text("Datos personales tratados conforme a la Ley N.º 29733. Uso interno de Grow Consultores.",
+              24, doc.internal.pageSize.getHeight() - 16);
+            doc.text(String(d.pageNumber), doc.internal.pageSize.getWidth() - 30,
+              doc.internal.pageSize.getHeight() - 16);
+          }
+        });
+        doc.save(nombreArchivo("pdf"));
+        fin();
+      }).catch(function () { fin(); alert("No pudimos preparar el PDF. Revisa tu conexión."); });
+  }
+
+  /* ───────────────── usuarios ───────────────── */
+
+  var usuarios = [];
+
+  function prepararUsuarios() {
+    opciones($("uNivel"), Object.keys(NIVELES).map(function (k) { return { v: k, t: NIVELES[k] }; }), "");
+    $("uNivel").value = "reclutadora";
+    $("uGuardar").addEventListener("click", guardarUsuario);
+  }
+
+  function cargarUsuarios() {
+    $("uTabla").className = "cargando";
+    $("uTabla").textContent = "Cargando…";
+    llamar({ accion: "usuarios.listar" }).then(function (r) {
+      if (!r.ok) { $("uTabla").textContent = "No pudimos cargar los usuarios."; return; }
+      usuarios = r.usuarios || [];
+      $("contUsu").textContent = usuarios.length + (usuarios.length === 1 ? " usuario" : " usuarios");
+      $("uTabla").className = "";
+      $("uTabla").innerHTML =
+        "<table><thead><tr><th>Correo</th><th>Nombre</th><th>Nivel</th><th>Estado</th><th>Desde</th><th></th></tr></thead><tbody>" +
+        usuarios.map(function (u) {
+          return "<tr><td><b>" + esc(u.correo) + "</b></td><td>" + esc(u.nombre || "—") + "</td>" +
+            "<td>" + esc(u.nivel_texto || u.nivel) + "</td>" +
+            "<td><span class='pill " + esc(u.estado) + "'>" + esc(u.estado) + "</span></td>" +
+            "<td>" + esc(u.creado || "—") + "</td>" +
+            "<td><button class='btn mini' data-u='" + esc(u.correo) + "'>Editar</button></td></tr>";
+        }).join("") + "</tbody></table>";
+      [].forEach.call($("uTabla").querySelectorAll("[data-u]"), function (b) {
+        b.addEventListener("click", function () {
+          var u = usuarios.filter(function (x) { return x.correo === b.getAttribute("data-u"); })[0];
+          if (!u) return;
+          $("uCorreo").value = u.correo; $("uNombre").value = u.nombre;
+          $("uNivel").value = u.nivel; $("uEstado").value = u.estado;
+          $("uCorreo").focus();
+        });
+      });
+    }).catch(function () { $("uTabla").textContent = "No pudimos cargar los usuarios."; });
+  }
+
+  function guardarUsuario() {
+    var u = { correo: $("uCorreo").value.trim().toLowerCase(), nombre: $("uNombre").value.trim(),
+              nivel: $("uNivel").value, estado: $("uEstado").value };
+    if (!u.correo || u.correo.indexOf("@") < 0) { aviso("uAviso", "Escribe un correo válido.", "bad"); return; }
+    $("uGuardar").disabled = true;
+    llamar({ accion: "usuarios.guardar", usuario: u }).then(function (r) {
+      $("uGuardar").disabled = false;
+      if (!r.ok) {
+        aviso("uAviso", r.error === "no_puedes_quitarte_el_acceso"
+          ? "No puedes quitarte a ti mismo el acceso de administrador."
+          : "No se pudo guardar (" + (r.error || "error") + ").", "bad");
+        return;
+      }
+      aviso("uAviso", r.creado ? "Usuario creado. Ya puede ingresar con su cuenta de Google." : "Usuario actualizado.", "ok");
+      $("uCorreo").value = ""; $("uNombre").value = "";
+      cargarUsuarios();
+    }).catch(function () {
+      $("uGuardar").disabled = false;
+      aviso("uAviso", "No se pudo guardar. Revisa tu conexión.", "bad");
+    });
+  }
+
+  /* ───────────────── inicio ───────────────── */
+
+  var guardada = leerSesion();
+  if (guardada) {
+    sesion = guardada; pase = guardada.pase;
+    llamar({ accion: "sesion" }).then(function (r) {
+      if (r && r.ok) { sesion = r.usuario; sesion.pase = pase; arrancar(); }
+      else cerrarSesion();
+    }).catch(cerrarSesion);
+  }
+
+  window.__gj = { llamar: function (c) { return llamar(c); } };
+})();
+</script>
+</body>
+</html>
