@@ -490,8 +490,43 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
       "</div></div>";
   }
 
+  function nuevoEnvioId() {
+    return "gj-" + Date.now().toString(36) + "-" +
+           Math.random().toString(36).slice(2, 10);
+  }
+
+  function enviarConReintento(datos, intento) {
+    // Apps Script puede demorar en su primer arranque del día. Si la respuesta
+    // no llega, reintentamos con la MISMA huella de envío: el backend reconoce
+    // el reenvío y no duplica la fila ni el correo.
+    var limite = 45000;
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var reloj = setTimeout(function () { if (ctrl) ctrl.abort(); }, limite);
+
+    var opciones = {
+      method: "POST",
+      body: JSON.stringify(datos),
+      headers: { "Content-Type": "text/plain;charset=utf-8" }
+    };
+    if (ctrl) opciones.signal = ctrl.signal;
+
+    return fetch(ENDPOINT, opciones)
+      .then(function (r) { clearTimeout(reloj); return r.json(); })
+      .then(function (r) {
+        if (!r || r.ok !== true) throw new Error("rechazado");
+        return r;
+      })
+      .catch(function (err) {
+        clearTimeout(reloj);
+        if (intento >= 2) throw err;
+        return new Promise(function (ok) { setTimeout(ok, 2500); })
+          .then(function () { return enviarConReintento(datos, intento + 1); });
+      });
+  }
+
   function wireForm(v, banco) {
     var asunto = banco ? "el banco de talento" : ("la vacante de " + (v ? v.titulo : ""));
+    var envioId = nuevoEnvioId();
     $("wa").href = "https://wa.me/" + WHATSAPP + "?text=" +
       encodeURIComponent("Hola, quiero postular a " + asunto + ".");
 
@@ -530,7 +565,8 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
         experiencia: $("exp").value, disponibilidad: $("dsp").value,
         pretension: $("pre").value.trim(),
         consentimiento: true, consentimiento_version: "v1 · Ley 29733",
-        enviado: new Date().toISOString(), origen: location.hostname || "local"
+        enviado: new Date().toISOString(), origen: location.hostname || "local",
+        envio_id: envioId
       };
 
       go.disabled = true; go.textContent = "Enviando…";
@@ -542,13 +578,11 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
           msg.textContent = "El formulario todavía no está conectado. Escríbenos por WhatsApp mientras tanto.";
           return;
         }
-        fetch(ENDPOINT, { method: "POST", body: JSON.stringify(datos),
-                          headers: { "Content-Type": "text/plain;charset=utf-8" } })
-          .then(function (r) { return r.json(); })
-          .then(function (r) {
-            if (!r || r.ok !== true) throw new Error("rechazado");
+        enviarConReintento(datos, 1)
+          .then(function () {
             $("fm").reset();
             $("cvTxt").textContent = "Adjunta tu CV · PDF, Word o foto · máx. 5 MB";
+            envioId = nuevoEnvioId();
             msg.className = "msg ok on";
             msg.textContent = banco
               ? "Listo. Tu perfil quedó registrado; te escribimos cuando salga una vacante para ti."
@@ -556,7 +590,8 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
           })
           .catch(function () {
             msg.className = "msg bad on";
-            msg.textContent = "No pudimos enviar tu postulación. Intenta de nuevo o escríbenos por WhatsApp.";
+            msg.textContent = "No pudimos confirmar el envío. Es posible que tus datos sí hayan llegado, " +
+              "así que no vuelvas a enviarlos: escríbenos por WhatsApp y lo verificamos contigo.";
           })
           .then(function () {
             go.disabled = false; go.textContent = banco ? "Enviar mi perfil" : "Enviar postulación";
