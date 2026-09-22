@@ -161,6 +161,7 @@ td.wrap{white-space:normal;min-width:200px}
         <div class="campo"><label for="vCliente">Empresa</label><select id="vCliente"></select></div>
         <div class="acciones">
           <button class="btn" id="vRecargar">Actualizar</button>
+          <button class="btn" id="vImportar">Importar las del portal</button>
           <button class="btn pri" id="vNueva">Nueva vacante</button>
         </div>
       </div>
@@ -384,6 +385,7 @@ td.wrap{white-space:normal;min-width:200px}
     if (pestanas.length) mostrar(pestanas[0].id);
 
     $("vNueva").style.display = puede("vacantes.editar") ? "" : "none";
+    $("vImportar").style.display = puede("vacantes.editar") ? "" : "none";
     $("pEstadoBtn").style.display = puede("postulantes.editar") ? "" : "none";
 
     prepararVacantes();
@@ -412,8 +414,35 @@ td.wrap{white-space:normal;min-width:200px}
     });
     $("vRecargar").addEventListener("click", cargarVacantes);
     $("vNueva").addEventListener("click", function () { abrirVacante(null); });
+    $("vImportar").addEventListener("click", importarDelPortal);
     $("vacCancelar").addEventListener("click", function () { $("fondoVac").className = "fondo"; });
     $("formVac").addEventListener("submit", guardarVacante);
+  }
+
+  // Carga inicial: trae al catálogo las vacantes que el portal ya publicaba en
+  // vacantes.json. Solo agrega las que falten, así que se puede repetir sin riesgo.
+  function importarDelPortal() {
+    var b = $("vImportar");
+    b.disabled = true; b.textContent = "Importando…";
+    fetch("../vacantes.json", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var lista = d && d.vacantes ? d.vacantes : (d && d.length ? d : []);
+        if (!lista.length) throw new Error("vacio");
+        return llamar({ accion: "vacantes.importar", vacantes: lista });
+      })
+      .then(function (r) {
+        b.disabled = false; b.textContent = "Importar las del portal";
+        if (!r || !r.ok) { alert("No se pudo importar."); return; }
+        alert(r.importadas
+          ? "Se agregaron " + r.importadas + (r.importadas === 1 ? " vacante." : " vacantes.")
+          : "No había vacantes nuevas por agregar.");
+        cargarVacantes();
+      })
+      .catch(function () {
+        b.disabled = false; b.textContent = "Importar las del portal";
+        alert("No pudimos leer el archivo de vacantes del portal.");
+      });
   }
 
   function cargarVacantes() {
