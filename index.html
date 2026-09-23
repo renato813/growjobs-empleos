@@ -295,14 +295,28 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
   };
   var quien = function (v) { return v.confidencial ? "Proceso confidencial" : (v.cliente || "Empresa del rubro"); };
 
-  fetch("./vacantes.json")
+  // Las vacantes salen del panel de administración, en vivo. Si la API no
+  // responde se usa la copia del repositorio para no dejar la página vacía.
+  var API_VACANTES = ENDPOINT + "?vacantes=1";
+
+  function usarVacantes(lista) {
+    VAC = (lista || []).filter(function (v) { return v.activa !== false; });
+    chips(); listar();
+  }
+
+  fetch(API_VACANTES)
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      VAC = (d.vacantes || []).filter(function (v) { return v.activa !== false; });
-      chips(); listar();
+      if (!d || !d.ok || !d.vacantes) throw new Error("sin datos");
+      usarVacantes(d.vacantes);
     })
     .catch(function () {
-      $("grid").innerHTML = '<div class="none">No pudimos cargar las vacantes. Vuelve a intentarlo en un momento.</div>';
+      return fetch("./vacantes.json")
+        .then(function (r) { return r.json(); })
+        .then(function (d) { usarVacantes(d.vacantes); })
+        .catch(function () {
+          $("grid").innerHTML = '<div class="none">No pudimos cargar las vacantes. Vuelve a intentarlo en un momento.</div>';
+        });
     });
 
   function chips() {
