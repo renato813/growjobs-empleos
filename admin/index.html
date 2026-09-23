@@ -98,6 +98,7 @@ td.wrap{white-space:normal;min-width:200px}
 .pill.activo{background:#E7F9F1;color:#166A47}
 .pill.inactivo{background:#EDEDED;color:#666}
 .conf{background:var(--warn-bg);color:var(--warn);font-weight:700;padding:2px 8px;border-radius:99px;font-size:11px}
+td.nota{max-width:420px;font-size:12.5px;color:var(--muted)}
 
 /* modal */
 .fondo{position:fixed;inset:0;background:rgba(15,20,25,.55);display:none;z-index:60;padding:20px;overflow:auto}
@@ -172,6 +173,7 @@ td.wrap{white-space:normal;min-width:200px}
       <div class="cabecera"><h2 class="disp">Postulantes</h2><span id="contPos"></span></div>
       <div class="barra">
         <div class="campo ancho"><label for="pBuscar">Buscar</label><input id="pBuscar" placeholder="Nombre, teléfono o correo"></div>
+        <div class="campo"><label for="pTipo">Origen</label><select id="pTipo"></select></div>
         <div class="campo"><label for="pVacante">Vacante</label><select id="pVacante"></select></div>
         <div class="campo"><label for="pCliente">Empresa</label><select id="pCliente"></select></div>
         <div class="campo"><label for="pArea">Área</label><select id="pArea"></select></div>
@@ -184,6 +186,8 @@ td.wrap{white-space:normal;min-width:200px}
         <div class="acciones">
           <button class="btn" id="pLimpiar">Limpiar filtros</button>
           <button class="btn" id="pRecargar">Actualizar</button>
+          <button class="btn" id="pImportar">Importar CSV</button>
+          <input id="pArchivo" type="file" accept=".csv,text/csv" style="display:none">
         </div>
       </div>
       <div class="barra">
@@ -309,6 +313,17 @@ td.wrap{white-space:normal;min-width:200px}
     lista.forEach(function (x) { var v = (x[campo] || "").trim(); if (v && !m[v]) { m[v] = 1; out.push(v); } });
     return out.sort(function (a, b) { return a.localeCompare(b, "es"); });
   }
+  // Un postulante puede tener más de un área ("Cocina · Barra"). La lista
+  // desplegable muestra áreas sueltas y el filtro busca por contenido.
+  function unicosSueltos(lista, campo) {
+    var m = {}, out = [];
+    lista.forEach(function (x) {
+      String(x[campo] || "").split("·").forEach(function (p) {
+        var v = p.trim(); if (v && !m[v]) { m[v] = 1; out.push(v); }
+      });
+    });
+    return out.sort(function (a, b) { return a.localeCompare(b, "es"); });
+  }
   function lineas(t) {
     return String(t || "").split("\n").map(function (x) { return x.trim(); }).filter(Boolean);
   }
@@ -329,14 +344,29 @@ td.wrap{white-space:normal;min-width:200px}
 
   function guardarPase(p) {
     pase = p;
-    try { sessionStorage.setItem("gj_pase", p); } catch (e) {}
+    try { localStorage.setItem("gj_pase", p); } catch (e) {}
   }
   function leerPase() {
-    try { return sessionStorage.getItem("gj_pase") || null; } catch (e) { return null; }
+    try { return localStorage.getItem("gj_pase") || null; } catch (e) { return null; }
+  }
+  // El panel guarda lo último que vio para pintarlo de inmediato al abrir,
+  // mientras el servidor confirma por detrás. Se borra al salir.
+  function guardarLocal(clave, valor) {
+    try { localStorage.setItem("gj_" + clave, JSON.stringify(valor)); } catch (e) {}
+  }
+  function leerLocal(clave) {
+    try { var s = localStorage.getItem("gj_" + clave); return s ? JSON.parse(s) : null; }
+    catch (e) { return null; }
+  }
+  function olvidarLocal() {
+    try {
+      ["gj_pase", "gj_usuario", "gj_vacantes", "gj_postulantes", "gj_usuarios"]
+        .forEach(function (k) { localStorage.removeItem(k); });
+    } catch (e) {}
   }
   function cerrarSesion() {
     sesion = null; pase = null;
-    try { sessionStorage.removeItem("gj_pase"); } catch (e) {}
+    olvidarLocal();
     try { history.replaceState(null, "", location.pathname); } catch (e) {}
     $("app").className = "";
     $("login").style.display = "grid";
@@ -365,7 +395,12 @@ td.wrap{white-space:normal;min-width:200px}
 
   /* ───────────────── arranque ───────────────── */
 
-  function arrancar() {
+  function arrancar(datos) {
+    if (datos) {
+      if (datos.vacantes) { vacantes = datos.vacantes; guardarLocal("vacantes", vacantes); }
+      if (datos.postulantes) { postulantes = datos.postulantes; guardarLocal("postulantes", postulantes); }
+      if (datos.usuarios) { usuarios = datos.usuarios; guardarLocal("usuarios", usuarios); }
+    }
     $("login").style.display = "none";
     $("app").className = "on";
     $("quienNombre").textContent = sesion.nombre || sesion.correo;
@@ -382,16 +417,28 @@ td.wrap{white-space:normal;min-width:200px}
     [].forEach.call($("navTabs").children, function (b) {
       b.addEventListener("click", function () { mostrar(b.getAttribute("data-v")); });
     });
-    if (pestanas.length) mostrar(pestanas[0].id);
+    // Al confirmar el servidor no se vuelve a la primera pestaña: si la persona
+    // ya estaba mirando Postulantes, se queda donde estaba.
+    var actual = preparado && document.querySelector(".vista.on");
+    mostrar(actual ? actual.id : (pestanas.length ? pestanas[0].id : ""));
 
     $("vNueva").style.display = puede("vacantes.editar") ? "" : "none";
     $("vImportar").style.display = puede("vacantes.editar") ? "" : "none";
     $("pEstadoBtn").style.display = puede("postulantes.editar") ? "" : "none";
+    $("pImportar").style.display = puede("postulantes.editar") ? "" : "none";
 
-    prepararVacantes();
-    prepararPostulantes();
-    prepararUsuarios();
+    if (!preparado) {
+      prepararVacantes();
+      prepararPostulantes();
+      prepararUsuarios();
+      preparado = true;
+    }
+    if (vacantes.length) pintarListaVacantes();
+    if (postulantes.length) pintarListaPostulantes();
+    if (usuarios.length) pintarUsuarios();
   }
+
+  var preparado = false;
 
   function mostrar(id) {
     [].forEach.call(document.querySelectorAll(".vista"), function (v) { v.className = "vista" + (v.id === id ? " on" : ""); });
@@ -399,6 +446,19 @@ td.wrap{white-space:normal;min-width:200px}
     if (id === "vVacantes" && !vacantes.length) cargarVacantes();
     if (id === "vPostulantes" && !postulantes.length) cargarPostulantes();
     if (id === "vUsuarios" && !usuarios.length) cargarUsuarios();
+    // Si ya están en memoria no se vuelve a consultar: cambiar de pestaña es instantáneo.
+  }
+
+  function refrescarTodo() {
+    $("vRecargar").disabled = true; $("pRecargar").disabled = true;
+    return llamar({ accion: "arranque" }).then(function (r) {
+      $("vRecargar").disabled = false; $("pRecargar").disabled = false;
+      if (!r || !r.ok) return;
+      sesion = r.usuario; guardarLocal("usuario", r.usuario);
+      arrancar(r);
+    }).catch(function () {
+      $("vRecargar").disabled = false; $("pRecargar").disabled = false;
+    });
   }
 
   /* ───────────────── vacantes ───────────────── */
@@ -412,7 +472,7 @@ td.wrap{white-space:normal;min-width:200px}
       $(id).addEventListener("input", pintarVacantes);
       $(id).addEventListener("change", pintarVacantes);
     });
-    $("vRecargar").addEventListener("click", cargarVacantes);
+    $("vRecargar").addEventListener("click", refrescarTodo);
     $("vNueva").addEventListener("click", function () { abrirVacante(null); });
     $("vImportar").addEventListener("click", importarDelPortal);
     $("vacCancelar").addEventListener("click", function () { $("fondoVac").className = "fondo"; });
@@ -437,7 +497,7 @@ td.wrap{white-space:normal;min-width:200px}
         alert(r.importadas
           ? "Se agregaron " + r.importadas + (r.importadas === 1 ? " vacante." : " vacantes.")
           : "No había vacantes nuevas por agregar.");
-        cargarVacantes();
+        refrescarTodo();
       })
       .catch(function () {
         b.disabled = false; b.textContent = "Importar las del portal";
@@ -451,10 +511,15 @@ td.wrap{white-space:normal;min-width:200px}
     llamar({ accion: "vacantes.listar" }).then(function (r) {
       if (!r.ok) { $("vTabla").textContent = "No pudimos cargar las vacantes."; return; }
       vacantes = r.vacantes || [];
-      opciones($("vFamilia"), unicos(vacantes, "familia"), "Todas");
-      opciones($("vCliente"), unicos(vacantes, "cliente"), "Todas");
-      pintarVacantes();
+      guardarLocal("vacantes", vacantes);
+      pintarListaVacantes();
     }).catch(function () { $("vTabla").textContent = "No pudimos cargar las vacantes."; });
+  }
+
+  function pintarListaVacantes() {
+    opciones($("vFamilia"), unicos(vacantes, "familia"), "Todas");
+    opciones($("vCliente"), unicos(vacantes, "cliente"), "Todas");
+    pintarVacantes();
   }
 
   function filtrarVacantes() {
@@ -507,7 +572,7 @@ td.wrap{white-space:normal;min-width:200px}
         b.addEventListener("click", function () {
           b.disabled = true;
           llamar({ accion: "vacantes.estado", id: b.getAttribute(par[0]), estado: par[1] })
-            .then(cargarVacantes).catch(function () { b.disabled = false; });
+            .then(refrescarTodo).catch(function () { b.disabled = false; });
         });
       });
     });
@@ -570,7 +635,7 @@ td.wrap{white-space:normal;min-width:200px}
       $("vacGuardar").disabled = false;
       if (!r.ok) { aviso("vacAviso", "No se pudo guardar (" + (r.error || "error") + ").", "bad"); return; }
       $("fondoVac").className = "fondo";
-      cargarVacantes();
+      refrescarTodo();
     }).catch(function () {
       $("vacGuardar").disabled = false;
       aviso("vacAviso", "No se pudo guardar. Revisa tu conexión.", "bad");
@@ -580,19 +645,23 @@ td.wrap{white-space:normal;min-width:200px}
   /* ───────────────── postulantes ───────────────── */
 
   var postulantes = [], marcados = {};
+  var FILTROS_P = ["pBuscar", "pTipo", "pVacante", "pCliente", "pArea", "pEstadoF",
+                   "pDistrito", "pExp", "pDisp", "pDesde", "pHasta"];
+  // Con ochocientas filas, pintar la tabla entera de golpe traba el navegador
+  // en un celular. Se pintan doscientas y el resto a pedido.
+  var TOPE = 200, tope = TOPE;
 
   function prepararPostulantes() {
     opciones($("pEstadoF"), ESTADOS_POSTULANTE, "Todos");
     opciones($("eEstado"), ESTADOS_POSTULANTE, "");
-    ["pBuscar", "pVacante", "pCliente", "pArea", "pEstadoF", "pDistrito", "pExp", "pDisp", "pDesde", "pHasta"]
-      .forEach(function (id) {
-        $(id).addEventListener("input", pintarPostulantes);
-        $(id).addEventListener("change", pintarPostulantes);
-      });
-    $("pRecargar").addEventListener("click", cargarPostulantes);
+    FILTROS_P.forEach(function (id) {
+      $(id).addEventListener("input", pintarPostulantes);
+      $(id).addEventListener("change", pintarPostulantes);
+    });
+    $("pRecargar").addEventListener("click", refrescarTodo);
     $("pLimpiar").addEventListener("click", function () {
-      ["pBuscar", "pVacante", "pCliente", "pArea", "pEstadoF", "pDistrito", "pExp", "pDisp", "pDesde", "pHasta"]
-        .forEach(function (id) { $(id).value = ""; });
+      FILTROS_P.forEach(function (id) { $(id).value = ""; });
+      tope = TOPE;
       pintarPostulantes();
     });
     $("pTodos").addEventListener("click", function () {
@@ -605,6 +674,84 @@ td.wrap{white-space:normal;min-width:200px}
     $("pEstadoBtn").addEventListener("click", abrirEstado);
     $("estadoCancelar").addEventListener("click", function () { $("fondoEstado").className = "fondo"; });
     $("estadoAplicar").addEventListener("click", aplicarEstado);
+    $("pImportar").addEventListener("click", function () { $("pArchivo").click(); });
+    $("pArchivo").addEventListener("change", importarCSV);
+  }
+
+  /* ─────────── importar una base en CSV ───────────
+     Lee el archivo en el navegador, comprueba que la cabecera sea la de la
+     hoja y lo manda por tandas. El servidor descarta los teléfonos repetidos,
+     así que volver a importar el mismo archivo no duplica a nadie. */
+
+  var CAB_CSV = ["Fecha de registro","Tipo","Vacante","Cliente","Nombres","Apellidos",
+                 "Teléfono","Correo","Distrito","Área de interés","Experiencia",
+                 "Disponibilidad","Pretensión salarial","CV","Consentimiento",
+                 "Versión del consentimiento","Origen","Estado","Reclutadora","Notas"];
+
+  function leerCSV(texto) {
+    if (texto.charCodeAt(0) === 0xFEFF) texto = texto.slice(1);
+    var filas = [], campo = "", fila = [], comillas = false;
+    for (var i = 0; i < texto.length; i++) {
+      var c = texto[i];
+      if (comillas) {
+        if (c === '"') { if (texto[i + 1] === '"') { campo += '"'; i++; } else comillas = false; }
+        else campo += c;
+      } else if (c === '"') { comillas = true; }
+      else if (c === ",") { fila.push(campo); campo = ""; }
+      else if (c === "\n") { fila.push(campo); filas.push(fila); fila = []; campo = ""; }
+      else if (c !== "\r") { campo += c; }
+    }
+    if (campo !== "" || fila.length) { fila.push(campo); filas.push(fila); }
+    return filas;
+  }
+
+  function importarCSV(ev) {
+    var archivo = ev.target.files && ev.target.files[0];
+    ev.target.value = "";
+    if (!archivo) return;
+    if (!puede("postulantes.editar")) { alert("Tu nivel no permite cargar postulantes."); return; }
+    var lector = new FileReader();
+    lector.onload = function () {
+      var filas = leerCSV(String(lector.result));
+      if (!filas.length) { alert("El archivo está vacío."); return; }
+      var cab = filas[0].map(function (x) { return x.trim(); });
+      if (cab.length !== CAB_CSV.length || cab[4] !== "Nombres" || cab[6] !== "Teléfono") {
+        alert("Ese CSV no tiene las columnas de la hoja de postulaciones.\n\n" +
+              "Se esperaban " + CAB_CSV.length + " columnas en este orden:\n" + CAB_CSV.join(" · "));
+        return;
+      }
+      var datos = filas.slice(1).filter(function (f) {
+        return f.length === CAB_CSV.length && String(f[6]).replace(/\D/g, "");
+      });
+      if (!datos.length) { alert("No encontré filas con teléfono para importar."); return; }
+      if (!confirm("Voy a cargar " + datos.length + " postulantes.\n" +
+                   "Los teléfonos que ya estén en la base se omiten solos.\n\n¿Sigo?")) return;
+      mandarTandas(datos, 0, 0, 0);
+    };
+    lector.readAsText(archivo, "utf-8");
+  }
+
+  function mandarTandas(datos, desde, hechas, omitidas) {
+    var TANDA = 150;
+    var boton = $("pImportar");
+    boton.disabled = true;
+    boton.textContent = "Cargando " + Math.min(desde + TANDA, datos.length) + " de " + datos.length + "…";
+    llamar({ accion: "postulantes.importar", filas: datos.slice(desde, desde + TANDA) })
+      .then(function (r) {
+        if (!r || !r.ok) throw new Error((r && r.error) || "error");
+        hechas += r.importadas || 0;
+        omitidas += r.omitidas || 0;
+        if (desde + TANDA < datos.length) { mandarTandas(datos, desde + TANDA, hechas, omitidas); return; }
+        boton.disabled = false; boton.textContent = "Importar CSV";
+        alert("Listo.\n\nNuevos: " + hechas + "\nRepetidos que omití: " + omitidas);
+        refrescarTodo();
+      })
+      .catch(function (e) {
+        boton.disabled = false; boton.textContent = "Importar CSV";
+        alert("Se cortó la carga después de " + hechas + " nuevos.\n" +
+              (String(e.message) === "sin_permiso" ? "Tu nivel no permite cargar postulantes."
+                                                   : "Vuelve a intentar: lo ya cargado no se repite."));
+      });
   }
 
   function cargarPostulantes() {
@@ -613,29 +760,38 @@ td.wrap{white-space:normal;min-width:200px}
     llamar({ accion: "postulantes.listar" }).then(function (r) {
       if (!r.ok) { $("pTabla").textContent = "No pudimos cargar los postulantes."; return; }
       postulantes = r.postulantes || [];
-      opciones($("pVacante"), unicos(postulantes, "vacante"), "Todas");
-      opciones($("pCliente"), unicos(postulantes, "cliente"), "Todas");
-      opciones($("pArea"), unicos(postulantes, "area"), "Todas");
-      opciones($("pDistrito"), unicos(postulantes, "distrito"), "Todos");
-      opciones($("pExp"), unicos(postulantes, "experiencia"), "Todas");
-      opciones($("pDisp"), unicos(postulantes, "disponibilidad"), "Todas");
-      pintarPostulantes();
+      guardarLocal("postulantes", postulantes);
+      pintarListaPostulantes();
     }).catch(function () { $("pTabla").textContent = "No pudimos cargar los postulantes."; });
+  }
+
+  function pintarListaPostulantes() {
+    opciones($("pTipo"), unicos(postulantes, "tipo"), "Todos");
+    opciones($("pVacante"), unicos(postulantes, "vacante"), "Todas");
+    opciones($("pCliente"), unicos(postulantes, "cliente"), "Todas");
+    opciones($("pArea"), unicosSueltos(postulantes, "area"), "Todas");
+    opciones($("pDistrito"), unicos(postulantes, "distrito"), "Todos");
+    opciones($("pExp"), unicos(postulantes, "experiencia"), "Todas");
+    opciones($("pDisp"), unicos(postulantes, "disponibilidad"), "Todas");
+    pintarPostulantes();
   }
 
   function filtrarPostulantes() {
     var q = $("pBuscar").value.trim().toLowerCase();
-    var f = { vacante: $("pVacante").value, cliente: $("pCliente").value, area: $("pArea").value,
+    var f = { tipo: $("pTipo").value, vacante: $("pVacante").value, cliente: $("pCliente").value,
               estado: $("pEstadoF").value, distrito: $("pDistrito").value,
               experiencia: $("pExp").value, disponibilidad: $("pDisp").value };
+    var area = $("pArea").value;
     var desde = $("pDesde").value, hasta = $("pHasta").value;
     return postulantes.filter(function (p) {
       for (var k in f) { if (f[k] && p[k] !== f[k]) return false; }
+      if (area && String(p.area || "").indexOf(area) < 0) return false;
       var dia = (p.fecha || "").slice(0, 10);
       if (desde && dia && dia < desde) return false;
       if (hasta && dia && dia > hasta) return false;
       if (q) {
-        var t = (p.nombres + " " + p.apellidos + " " + p.telefono + " " + p.correo + " " + p.distrito).toLowerCase();
+        var t = (p.nombres + " " + p.apellidos + " " + p.telefono + " " + p.correo + " " +
+                 p.distrito + " " + p.vacante + " " + p.notas).toLowerCase();
         if (t.indexOf(q) < 0) return false;
       }
       return true;
@@ -658,11 +814,12 @@ td.wrap{white-space:normal;min-width:200px}
       return;
     }
     $("pTabla").className = "";
+    var visibles = lista.slice(0, tope);
     $("pTabla").innerHTML =
       "<table><thead><tr><th></th><th>Fecha</th><th>Nombre</th><th>WhatsApp</th><th>Correo</th><th>Distrito</th>" +
       "<th>Vacante</th><th>Empresa</th><th>Área</th><th>Experiencia</th><th>Disponibilidad</th>" +
-      "<th>Pretensión</th><th>CV</th><th>Estado</th><th>Reclutadora</th></tr></thead><tbody>" +
-      lista.map(function (p) {
+      "<th>Pretensión</th><th>CV</th><th>Estado</th><th>Reclutadora</th><th>Historial</th></tr></thead><tbody>" +
+      visibles.map(function (p) {
         return "<tr><td><input type='checkbox' data-f='" + p.fila + "'" + (marcados[p.fila] ? " checked" : "") + "></td>" +
           "<td>" + esc(p.fecha) + "</td>" +
           "<td class='wrap'><b>" + esc(p.nombres + " " + p.apellidos) + "</b></td>" +
@@ -677,8 +834,17 @@ td.wrap{white-space:normal;min-width:200px}
           "<td>" + esc(p.pretension || "—") + "</td>" +
           "<td class='wrap'>" + esc(p.cv || "—") + "</td>" +
           "<td>" + esc(p.estado || "—") + "</td>" +
-          "<td>" + esc(p.reclutadora || "—") + "</td></tr>";
-      }).join("") + "</tbody></table>";
+          "<td>" + esc(p.reclutadora || "—") + "</td>" +
+          "<td class='wrap nota'>" + esc(p.notas || "") + "</td></tr>";
+      }).join("") + "</tbody></table>" +
+      (lista.length > visibles.length
+        ? "<div style='padding:14px;text-align:center'><button class='btn' id='pMas'>Mostrar " +
+          Math.min(TOPE, lista.length - visibles.length) + " más de " +
+          (lista.length - visibles.length) + "</button></div>"
+        : "");
+
+    var mas = $("pMas");
+    if (mas) mas.addEventListener("click", function () { tope += TOPE; pintarPostulantes(); });
 
     [].forEach.call($("pTabla").querySelectorAll("input[data-f]"), function (c) {
       c.addEventListener("change", function () {
@@ -717,7 +883,7 @@ td.wrap{white-space:normal;min-width:200px}
         if (!r.ok) { aviso("estadoAviso", "No se pudo actualizar.", "bad"); return; }
         $("fondoEstado").className = "fondo";
         marcados = {};
-        cargarPostulantes();
+        refrescarTodo();
       }).catch(function () {
         $("estadoAplicar").disabled = false;
         aviso("estadoAviso", "No se pudo actualizar.", "bad");
@@ -826,6 +992,12 @@ td.wrap{white-space:normal;min-width:200px}
     llamar({ accion: "usuarios.listar" }).then(function (r) {
       if (!r.ok) { $("uTabla").textContent = "No pudimos cargar los usuarios."; return; }
       usuarios = r.usuarios || [];
+      guardarLocal("usuarios", usuarios);
+      pintarUsuarios();
+    }).catch(function () { $("uTabla").textContent = "No pudimos cargar los usuarios."; });
+  }
+
+  function pintarUsuarios() {
       $("contUsu").textContent = usuarios.length + (usuarios.length === 1 ? " usuario" : " usuarios");
       $("uTabla").className = "";
       $("uTabla").innerHTML =
@@ -846,7 +1018,6 @@ td.wrap{white-space:normal;min-width:200px}
           $("uCorreo").focus();
         });
       });
-    }).catch(function () { $("uTabla").textContent = "No pudimos cargar los usuarios."; });
   }
 
   function guardarUsuario() {
@@ -864,7 +1035,7 @@ td.wrap{white-space:normal;min-width:200px}
       }
       aviso("uAviso", r.creado ? "Usuario creado. Ya puede ingresar con su cuenta de Google." : "Usuario actualizado.", "ok");
       $("uCorreo").value = ""; $("uNombre").value = "";
-      cargarUsuarios();
+      refrescarTodo();
     }).catch(function () {
       $("uGuardar").disabled = false;
       aviso("uAviso", "No se pudo guardar. Revisa tu conexión.", "bad");
@@ -884,10 +1055,24 @@ td.wrap{white-space:normal;min-width:200px}
   if (pase) {
     $("entrar").disabled = true;
     $("entrar").textContent = "Verificando tu acceso…";
-    llamar({ accion: "sesion" }).then(function (r) {
-      if (r && r.ok) { sesion = r.usuario; arrancar(); }
-      else cerrarSesion();
-    }).catch(cerrarSesion);
+
+    // Si ya hay datos de la última visita, el panel se pinta al instante y la
+    // llamada al servidor solo confirma y refresca por detrás.
+    var previo = leerLocal("usuario");
+    if (previo && previo.permisos) {
+      sesion = previo;
+      vacantes = leerLocal("vacantes") || [];
+      postulantes = leerLocal("postulantes") || [];
+      usuarios = leerLocal("usuarios") || [];
+      arrancar();
+    }
+
+    llamar({ accion: "arranque" }).then(function (r) {
+      if (!r || !r.ok) { cerrarSesion(); return; }
+      sesion = r.usuario;
+      guardarLocal("usuario", r.usuario);
+      arrancar(r);
+    }).catch(function () { if (!sesion) cerrarSesion(); });
   }
 
   window.__gj = { llamar: function (c) { return llamar(c); } };
