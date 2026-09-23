@@ -212,7 +212,7 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
       <h2 class="disp">Vacantes activas</h2>
       <span id="count"></span>
     </div>
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid"><div class="none">Cargando vacantes…</div></div>
   </main>
 
   <section class="strip">
@@ -295,28 +295,33 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
   };
   var quien = function (v) { return v.confidencial ? "Proceso confidencial" : (v.cliente || "Empresa del rubro"); };
 
-  // Las vacantes salen del panel de administración, en vivo. Si la API no
-  // responde se usa la copia del repositorio para no dejar la página vacía.
+  // Las vacantes salen del panel de administración, en vivo. Como esa llamada
+  // puede tardar unos segundos, primero se pinta la copia del repositorio
+  // (instantánea) y en cuanto llega la versión en vivo se reemplaza.
   var API_VACANTES = ENDPOINT + "?vacantes=1";
+  var pintadoEnVivo = false;
 
   function usarVacantes(lista) {
     VAC = (lista || []).filter(function (v) { return v.activa !== false; });
     chips(); listar();
   }
 
+  fetch("./vacantes.json")
+    .then(function (r) { return r.json(); })
+    .then(function (d) { if (!pintadoEnVivo) usarVacantes(d.vacantes); })
+    .catch(function () { /* si tampoco hay copia, esperamos a la API */ });
+
   fetch(API_VACANTES)
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (!d || !d.ok || !d.vacantes) throw new Error("sin datos");
+      pintadoEnVivo = true;
       usarVacantes(d.vacantes);
     })
     .catch(function () {
-      return fetch("./vacantes.json")
-        .then(function (r) { return r.json(); })
-        .then(function (d) { usarVacantes(d.vacantes); })
-        .catch(function () {
-          $("grid").innerHTML = '<div class="none">No pudimos cargar las vacantes. Vuelve a intentarlo en un momento.</div>';
-        });
+      if (!VAC.length) {
+        $("grid").innerHTML = '<div class="none">No pudimos cargar las vacantes. Vuelve a intentarlo en un momento.</div>';
+      }
     });
 
   function chips() {
