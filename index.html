@@ -369,6 +369,7 @@ details.priv p{margin-top:9px;font-size:12px;color:#8091AC;max-width:70ch}
         '<span class="tags">' +
           (v.confidencial ? '<span class="tag conf">Confidencial</span>' : "") +
           (v.contrato ? '<span class="tag">' + esc(v.contrato) + "</span>" : "") +
+          (v.jornada && v.jornada !== "Tiempo completo" ? '<span class="tag">' + esc(v.jornada) + "</span>" : "") +
           (v.propinas && v.propinas !== "No aplica" ? '<span class="tag">Propina ' + esc(v.propinas.toLowerCase()) + "</span>" : "") +
         "</span>" +
         "<footer><span>" + esc(v.publicada || "") + "</span><b>Ver y postular →</b></footer>" +
